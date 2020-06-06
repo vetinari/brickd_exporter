@@ -1,0 +1,7 @@
+collector:
+    log_level: debug
+listen:
+    address: :9992
+    metrics_path: /metrics
+brickd:
+    address: hide-park:4223
