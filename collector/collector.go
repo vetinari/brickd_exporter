@@ -13,6 +13,7 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/master_brick"
 
 	// bricklets:
+	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
 )
 
@@ -80,8 +81,11 @@ func NewCollector(addr, password string) *BrickdCollector {
 		Values:   make(chan Value),
 	}
 	brickd.Devices = map[uint16]RegisterFunc{
-		master_brick.DeviceIdentifier:      brickd.RegisterMasterBrick,
-		humidity_bricklet.DeviceIdentifier: brickd.RegisterHumidityBricklet,
+		// Bricks
+		master_brick.DeviceIdentifier: brickd.RegisterMasterBrick,
+		// Bricklets
+		barometer_bricklet.DeviceIdentifier: brickd.RegisterBarometerBricklet,
+		humidity_bricklet.DeviceIdentifier:  brickd.RegisterHumidityBricklet,
 	}
 
 	go brickd.Update()
