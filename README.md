@@ -1,6 +1,6 @@
 # Prometheus Brickd Exporter
 
-The brickd exporter is a Prometheus exporter to connect to a [Tinkerforge](https://www.tinkerforge.com/)
+The brickd exporter is a Prometheus exporter which connects to a [Tinkerforge](https://www.tinkerforge.com/)
 [brickd](https://www.tinkerforge.com/en/doc/Software/Brickd.html) and exports the values from the
 connected bricks and bricklets.
 
@@ -28,7 +28,7 @@ When no `--config.file /path/to/brickd.yml` is given, the default config is:
 collector:
     log_level: info
 listen:
-    address: :9992
+    address: :9639
     metrics_path: /metrics
 brickd:
     address: localhost:4223

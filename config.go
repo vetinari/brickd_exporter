@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	defaultListenAddress = ":9549"
+	defaultListenAddress = ":9639"
 	defaultMetricsPath   = "/metrics"
 )
 
