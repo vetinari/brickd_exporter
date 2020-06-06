@@ -3,6 +3,7 @@ package collector
 import (
 	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -28,11 +29,53 @@ func (b *BrickdCollector) RegisterHumidityBricklet(uid string) []Register {
 	}
 }
 
+func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) []Register {
+	d, _ := humidity_v2_bricklet.New(uid, &b.Connection)
+	// FIXME handle error here and return nil
+	humID := d.RegisterHumidityCallback(func(humidity uint16) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: humidity_v2_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Humidity of the air in %rF",
+			Name:     "humidity",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(humidity) / 100.0,
+		}
+	})
+	d.SetHumidityCallbackConfiguration(10_000, true, 'x', 0, 0)
+
+	tempID := d.RegisterTemperatureCallback(func(temperature int16) {
+		b.Values <- Value{
+			Index:    1,
+			DeviceID: humidity_v2_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Temperature of the air in %rF",
+			Name:     "temperature",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(temperature) / 100.0,
+		}
+	})
+	d.SetTemperatureCallbackConfiguration(10_000, true, 'x', 0, 0)
+
+	return []Register{
+		{
+			Deregister: d.DeregisterHumidityCallback,
+			ID:         humID,
+		},
+		{
+			Deregister: d.DeregisterTemperatureCallback,
+			ID:         tempID,
+		},
+	}
+}
+
 func (b *BrickdCollector) RegisterBarometerBricklet(uid string) []Register {
 	d, _ := barometer_bricklet.New(uid, &b.Connection)
 	// FIXME handle error here and return nil
 	apID := d.RegisterAirPressureCallback(func(airPressure int32) {
 		b.Values <- Value{
+			Index:    0,
 			DeviceID: barometer_bricklet.DeviceIdentifier,
 			UID:      uid,
 			Help:     "Air Pressure in hPa",
@@ -45,6 +88,7 @@ func (b *BrickdCollector) RegisterBarometerBricklet(uid string) []Register {
 
 	altID := d.RegisterAltitudeCallback(func(altitude int32) {
 		b.Values <- Value{
+			Index:    1,
 			DeviceID: barometer_bricklet.DeviceIdentifier,
 			UID:      uid,
 			Help:     "Altitude in m",

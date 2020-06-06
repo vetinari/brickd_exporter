@@ -48,11 +48,13 @@ Start with `--config.file /path/to/brickd.yml` to pass a config file.
 
 Bricks:
 
-* Master Brick
+* [Master Brick](https://www.tinkerforge.com/en/doc/Hardware/Bricks/Master_Brick.html)
 
 Bricklets:
 
-* Humidity Bricklet
+* [Barometer Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Barometer.html)
+* [Humidity Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Humidity.html)
+* [Humidity Bricklet v2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Humidity_V2.html)
 
 Adding more is easy, see [Contributing](#contributing)
 
