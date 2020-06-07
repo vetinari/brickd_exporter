@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"fmt"
 	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
@@ -8,9 +9,12 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func (b *BrickdCollector) RegisterHumidityBricklet(uid string) []Register {
-	d, _ := humidity_bricklet.New(uid, &b.Connection)
-	// FIXME handle error here and return nil
+func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, error) {
+	d, err := humidity_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Humidity Bricklet (uid=%s): %s", uid, err)
+	}
+
 	callbackID := d.RegisterHumidityCallback(func(humidity uint16) {
 		b.Values <- Value{
 			DeviceID: humidity_bricklet.DeviceIdentifier,
@@ -27,12 +31,15 @@ func (b *BrickdCollector) RegisterHumidityBricklet(uid string) []Register {
 			Deregister: d.DeregisterHumidityCallback,
 			ID:         callbackID,
 		},
-	}
+	}, nil
 }
 
-func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) []Register {
-	d, _ := humidity_v2_bricklet.New(uid, &b.Connection)
-	// FIXME handle error here and return nil
+func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) ([]Register, error) {
+	d, err := humidity_v2_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Humidity Bricklet V2.0 (uid=%s): %s", uid, err)
+	}
+
 	humID := d.RegisterHumidityCallback(func(humidity uint16) {
 		b.Values <- Value{
 			Index:    0,
@@ -68,12 +75,15 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) []Register {
 			Deregister: d.DeregisterTemperatureCallback,
 			ID:         tempID,
 		},
-	}
+	}, nil
 }
 
-func (b *BrickdCollector) RegisterBarometerBricklet(uid string) []Register {
-	d, _ := barometer_bricklet.New(uid, &b.Connection)
-	// FIXME handle error here and return nil
+func (b *BrickdCollector) RegisterBarometerBricklet(uid string) ([]Register, error) {
+	d, err := barometer_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Barometer Bricklet (uid=%s): %s", uid, err)
+	}
+
 	apID := d.RegisterAirPressureCallback(func(airPressure int32) {
 		b.Values <- Value{
 			Index:    0,
@@ -109,12 +119,15 @@ func (b *BrickdCollector) RegisterBarometerBricklet(uid string) []Register {
 			Deregister: d.DeregisterAltitudeCallback,
 			ID:         altID,
 		},
-	}
+	}, nil
 }
 
-func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) []Register {
-	d, _ := barometer_v2_bricklet.New(uid, &b.Connection)
-	// FIXME handle error here and return nil
+func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, error) {
+	d, err := barometer_v2_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Barometer Bricklet V2.0 (uid=%s): %s", uid, err)
+	}
+
 	apID := d.RegisterAirPressureCallback(func(airPressure int32) {
 		b.Values <- Value{
 			Index:    0,
@@ -167,5 +180,5 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) []Register {
 			Deregister: d.DeregisterTemperatureCallback,
 			ID:         tempID,
 		},
-	}
+	}, nil
 }

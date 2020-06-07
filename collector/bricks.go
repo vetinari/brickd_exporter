@@ -1,14 +1,19 @@
 package collector
 
 import (
+	"fmt"
+
 	// log "github.com/sirupsen/logrus"
 	"github.com/Tinkerforge/go-api-bindings/master_brick"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func (b *BrickdCollector) RegisterMasterBrick(uid string) []Register {
-	m, _ := master_brick.New(uid, &b.Connection)
-	// FIXME handle error here and return nil
+func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
+	m, err := master_brick.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Master Brick (uid=%s): %s", uid, err)
+	}
+
 	currID := m.RegisterStackCurrentCallback(func(current uint16) {
 		b.Values <- Value{
 			Index:    0,
@@ -61,5 +66,5 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) []Register {
 			Deregister: m.DeregisterUSBVoltageCallback,
 			ID:         usbVID,
 		},
-	}
+	}, nil
 }

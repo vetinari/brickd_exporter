@@ -32,7 +32,7 @@ type BrickdCollector struct {
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
-type RegisterFunc func(string) []Register
+type RegisterFunc func(string) ([]Register, error)
 
 // BrickData are discovered devices and their values
 type BrickData struct {
