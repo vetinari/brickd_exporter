@@ -85,26 +85,30 @@ func (b *BrickdCollector) OnEnumerate(
 
 	regFunc, ok := b.Devices[dev.DeviceID]
 	if !ok {
-		log.Debugf("not setting callback for: %s %d", dev.UID, dev.DeviceID)
+		log.Debugf("no callbacks available for %s (uid=%s)", DeviceName(dev.DeviceID), dev.UID)
 		return
 	}
 
 	if _, ok := b.Registry[dev.UID]; ok {
-		log.Debugf("callback already registered: %s %d", dev.UID, dev.DeviceID)
+		log.Debugf("callback already registered for %s (uid=%s)", DeviceName(dev.DeviceID), dev.UID)
 		for _, reg := range b.Registry[dev.UID] {
-			log.Debugf("callback for %s %d -> %d", dev.UID, dev.DeviceID, reg.ID)
+			log.Debugf("callback for %s (uid=%s): %d", DeviceName(dev.DeviceID), dev.UID, reg.ID)
 		}
 		return
 	}
 
-	reg := regFunc(dev.UID)
+	reg, err := regFunc(dev.UID)
+	if err != nil {
+		log.Warnf("failed to register device %s (uid=%s): %s", DeviceName(dev.DeviceID), dev.UID, err)
+		return
+	}
 	if len(reg) == 0 {
-		log.Debugf("no registry returned from %s %d", dev.UID, dev.DeviceID)
+		log.Debugf("no registry returned from %s (uid=%s)", DeviceName(dev.DeviceID), dev.UID)
 		return
 	}
 	b.Data.Devices[dev.UID] = dev
 	b.Registry[dev.UID] = reg
 	for _, reg := range b.Registry[dev.UID] {
-		log.Debugf("callback registered for %s %d -> %d", dev.UID, dev.DeviceID, reg.ID)
+		log.Debugf("callback registered for %s (uid=%s): %d", DeviceName(dev.DeviceID), dev.DeviceID, reg.ID)
 	}
 }
