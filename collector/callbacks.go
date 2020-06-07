@@ -109,6 +109,6 @@ func (b *BrickdCollector) OnEnumerate(
 	b.Data.Devices[dev.UID] = dev
 	b.Registry[dev.UID] = reg
 	for _, reg := range b.Registry[dev.UID] {
-		log.Debugf("callback registered for %s (uid=%s): %d", DeviceName(dev.DeviceID), dev.DeviceID, reg.ID)
+		log.Debugf("callback registered for %s (uid=%s): %d", DeviceName(dev.DeviceID), dev.UID, reg.ID)
 	}
 }
