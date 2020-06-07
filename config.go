@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	flag "github.com/spf13/pflag"
 	"gopkg.in/yaml.v2"
@@ -31,7 +32,8 @@ type BrickdConfig struct {
 }
 
 type CollectorConfig struct {
-	LogLevel string `yaml:"log_level"`
+	LogLevel       string        `yaml:"log_level"`
+	CallbackPeriod time.Duration `yaml:"callback_period"`
 }
 
 func parseConfig() (*LocalConfig, error) {
@@ -65,7 +67,8 @@ func defaultConfig() (*LocalConfig, error) {
 			MetricsPath: defaultMetricsPath,
 		},
 		Collector: CollectorConfig{
-			LogLevel: "info",
+			LogLevel:       "info",
+			CallbackPeriod: 10 * time.Second,
 		},
 	}, nil
 }

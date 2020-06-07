@@ -25,7 +25,7 @@ func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, erro
 			Value:    float64(humidity) / 10.0,
 		}
 	})
-	d.SetHumidityCallbackPeriod(10_000)
+	d.SetHumidityCallbackPeriod(b.CallbackPeriod)
 	return []Register{
 		{
 			Deregister: d.DeregisterHumidityCallback,
@@ -51,7 +51,7 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) ([]Register, er
 			Value:    float64(humidity) / 100.0,
 		}
 	})
-	d.SetHumidityCallbackConfiguration(10_000, true, 'x', 0, 0)
+	d.SetHumidityCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
 	tempID := d.RegisterTemperatureCallback(func(temperature int16) {
 		b.Values <- Value{
@@ -64,7 +64,7 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) ([]Register, er
 			Value:    float64(temperature) / 100.0,
 		}
 	})
-	d.SetTemperatureCallbackConfiguration(10_000, true, 'x', 0, 0)
+	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
 	return []Register{
 		{
@@ -95,7 +95,7 @@ func (b *BrickdCollector) RegisterBarometerBricklet(uid string) ([]Register, err
 			Value:    float64(airPressure) * 1000.0,
 		}
 	})
-	d.SetAirPressureCallbackPeriod(10_000)
+	d.SetAirPressureCallbackPeriod(b.CallbackPeriod)
 
 	altID := d.RegisterAltitudeCallback(func(altitude int32) {
 		b.Values <- Value{
@@ -108,7 +108,7 @@ func (b *BrickdCollector) RegisterBarometerBricklet(uid string) ([]Register, err
 			Value:    float64(altitude) * 100.0,
 		}
 	})
-	d.SetAltitudeCallbackPeriod(10_000)
+	d.SetAltitudeCallbackPeriod(b.CallbackPeriod)
 
 	return []Register{
 		{
@@ -139,7 +139,7 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 			Value:    float64(airPressure) * 1000.0,
 		}
 	})
-	d.SetAirPressureCallbackConfiguration(10_000, true, 'x', 0, 0)
+	d.SetAirPressureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
 	altID := d.RegisterAltitudeCallback(func(altitude int32) {
 		b.Values <- Value{
@@ -152,7 +152,7 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 			Value:    float64(altitude) * 1000.0,
 		}
 	})
-	d.SetAltitudeCallbackConfiguration(10_000, true, 'x', 0, 0)
+	d.SetAltitudeCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
 	tempID := d.RegisterTemperatureCallback(func(temperature int32) {
 		b.Values <- Value{
@@ -165,7 +165,7 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 			Value:    float64(temperature) * 100.0,
 		}
 	})
-	d.SetTemperatureCallbackConfiguration(10_000, true, 'x', 0, 0)
+	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
 	return []Register{
 		{

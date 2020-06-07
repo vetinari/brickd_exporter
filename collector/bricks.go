@@ -25,7 +25,7 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
 			Value:    float64(current) / 1000.0,
 		}
 	})
-	m.SetStackCurrentCallbackPeriod(10_000)
+	m.SetStackCurrentCallbackPeriod(b.CallbackPeriod)
 
 	voltID := m.RegisterStackVoltageCallback(func(voltage uint16) {
 		b.Values <- Value{
@@ -38,7 +38,7 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
 			Value:    float64(voltage) / 1000.0,
 		}
 	})
-	m.SetStackVoltageCallbackPeriod(10_000)
+	m.SetStackVoltageCallbackPeriod(b.CallbackPeriod)
 
 	usbVID := m.RegisterUSBVoltageCallback(func(voltage uint16) {
 		b.Values <- Value{
@@ -51,7 +51,7 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
 			Value:    float64(voltage) / 1000.0,
 		}
 	})
-	m.SetUSBVoltageCallbackPeriod(10_000)
+	m.SetUSBVoltageCallbackPeriod(b.CallbackPeriod)
 
 	return []Register{
 		{

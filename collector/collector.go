@@ -22,13 +22,14 @@ import (
 // BrickdCollector does all the work
 type BrickdCollector struct {
 	sync.RWMutex
-	Address    string
-	Password   string
-	Data       *BrickData
-	Registry   map[string][]Register
-	Connection ipconnection.IPConnection
-	Values     chan Value
-	Devices    map[uint16]RegisterFunc
+	Address        string
+	Password       string
+	Data           *BrickData
+	Registry       map[string][]Register
+	Connection     ipconnection.IPConnection
+	Values         chan Value
+	Devices        map[uint16]RegisterFunc
+	CallbackPeriod uint32
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
@@ -70,7 +71,7 @@ type Device struct {
 }
 
 // NewCollector creates a new collector for the given address (and authenticates with the password)
-func NewCollector(addr, password string) *BrickdCollector {
+func NewCollector(addr, password string, cbPeriod time.Duration) *BrickdCollector {
 	brickd := &BrickdCollector{
 		Address:  addr,
 		Password: password,
@@ -79,8 +80,9 @@ func NewCollector(addr, password string) *BrickdCollector {
 			Devices: make(map[string]*Device),
 			Values:  make(map[string][]Value),
 		},
-		Registry: make(map[string][]Register),
-		Values:   make(chan Value),
+		Registry:       make(map[string][]Register),
+		Values:         make(chan Value),
+		CallbackPeriod: uint32(cbPeriod / time.Millisecond),
 	}
 	brickd.Devices = map[uint16]RegisterFunc{
 		// Bricks

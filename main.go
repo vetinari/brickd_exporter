@@ -24,7 +24,7 @@ func main() {
 	}
 	log.SetLevel(lvl)
 
-	c := collector.NewCollector(config.Brickd.Address, config.Brickd.Password)
+	c := collector.NewCollector(config.Brickd.Address, config.Brickd.Password, config.Collector.CallbackPeriod)
 	prometheus.MustRegister(c)
 
 	listenAddress := config.Listen.Address

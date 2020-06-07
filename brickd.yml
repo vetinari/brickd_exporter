@@ -1,5 +1,6 @@
 collector:
     log_level: debug
+    callback_period: 10s
 listen:
     address: :9639
     metrics_path: /metrics

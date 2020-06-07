@@ -4,8 +4,8 @@ The brickd exporter is a Prometheus exporter which connects to a [Tinkerforge](h
 [brickd](https://www.tinkerforge.com/en/doc/Software/Brickd.html) and exports the values from the
 connected bricks and bricklets.
 
-Data from the brickd is collected in the background. Current *CallbackPeriod are set to 10,000 ms (likely
-to be configurable in the future).
+Data from the brickd is collected in the background. Currently callbackPeriod is set to 10,000 ms, which can
+be changed in the config.
 
 ## Usage
 
@@ -27,6 +27,7 @@ When no `--config.file /path/to/brickd.yml` is given, the default config is:
 ```yaml
 collector:
     log_level: info
+    callback_period: 10s
 listen:
     address: :9639
     metrics_path: /metrics
