@@ -28,6 +28,7 @@ When no `--config.file /path/to/brickd.yml` is given, the default config is:
 collector:
     log_level: info
     callback_period: 10s
+    ignored_uids: []
 listen:
     address: :9639
     metrics_path: /metrics
@@ -57,6 +58,7 @@ Bricklets:
 * [Barometer Bricklet v2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Barometer_V2.html)
 * [Humidity Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Humidity.html)
 * [Humidity Bricklet v2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Humidity_V2.html)
+* [Outdoor Weather Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Outdoor_Weather.html)
 
 Adding more is easy, see [Contributing](#contributing)
 
