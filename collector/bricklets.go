@@ -2,6 +2,7 @@ package collector
 
 import (
 	"fmt"
+
 	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
