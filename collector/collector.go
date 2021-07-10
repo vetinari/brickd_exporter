@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Tinkerforge/go-api-bindings/ipconnection"
+	"github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 
@@ -30,6 +31,7 @@ type BrickdCollector struct {
 	Values         chan Value
 	Devices        map[uint16]RegisterFunc
 	CallbackPeriod uint32
+	IgnoredUIDs    []string
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
@@ -47,6 +49,7 @@ type Value struct {
 	Index    int                  // index in BrickData.Values, needs to be assigned by the callback
 	DeviceID uint16               // https://www.tinkerforge.com/en/doc/Software/Device_Identifier.html
 	UID      string               // UID as given from brickd
+	SubID    int                  // sub id in outdoor_weather_bricklet
 	Type     prometheus.ValueType // probably just prometheus.GaugeValue
 	Help     string               // help for users, i.e. prometheus' "# HELP brickd_humidity_value ..." line, (just the help text)
 	Name     string               // value name, such as "usb_voltage" or "humidity"
@@ -71,7 +74,7 @@ type Device struct {
 }
 
 // NewCollector creates a new collector for the given address (and authenticates with the password)
-func NewCollector(addr, password string, cbPeriod time.Duration) *BrickdCollector {
+func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []string) *BrickdCollector {
 	brickd := &BrickdCollector{
 		Address:  addr,
 		Password: password,
@@ -83,6 +86,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration) *BrickdCollecto
 		Registry:       make(map[string][]Register),
 		Values:         make(chan Value),
 		CallbackPeriod: uint32(cbPeriod / time.Millisecond),
+		IgnoredUIDs:    ignoredUIDs,
 	}
 	brickd.Devices = map[uint16]RegisterFunc{
 		// Bricks
@@ -92,10 +96,21 @@ func NewCollector(addr, password string, cbPeriod time.Duration) *BrickdCollecto
 		barometer_v2_bricklet.DeviceIdentifier: brickd.RegisterBarometerBricklet,
 		humidity_bricklet.DeviceIdentifier:     brickd.RegisterHumidityBricklet,
 		humidity_v2_bricklet.DeviceIdentifier:  brickd.RegisterHumidityV2Bricklet,
+
+		outdoor_weather_bricklet.DeviceIdentifier: brickd.RegisterOutdoorWeatherBricklet,
 	}
 
 	go brickd.Update()
 	return brickd
+}
+
+func (b *BrickdCollector) ignored(uid string) bool {
+	for _, u := range b.IgnoredUIDs {
+		if uid == u {
+			return true
+		}
+	}
+	return false
 }
 
 // Update runs in the background and discovers devices and collects the Values
@@ -119,9 +134,16 @@ func (b *BrickdCollector) Update() {
 
 	for v := range b.Values {
 		b.Lock()
+		if b.ignored(v.UID) {
+			continue
+		}
 		log.Debugf("received value from \"%s\" (uid=%s): %s=%f\n", DeviceName(v.DeviceID), v.UID, v.Name, v.Value)
 		if _, ok := b.Data.Values[v.UID]; !ok {
-			b.Data.Values[v.UID] = make([]Value, 4) // FIXME OutdoorWeather_Bricklet may have more values
+			if v.DeviceID == outdoor_weather_bricklet.DeviceIdentifier {
+				b.Data.Values[v.UID] = make([]Value, 2*256*256) // ouch :)
+			} else {
+				b.Data.Values[v.UID] = make([]Value, 4)
+			}
 		}
 		b.Data.Values[v.UID][v.Index] = v
 		b.Unlock()
@@ -139,7 +161,7 @@ func (b *BrickdCollector) Collect(ch chan<- prometheus.Metric) {
 	defer b.RUnlock()
 	for _, vals := range b.Data.Values {
 		for _, v := range vals {
-			if v.UID == "" {
+			if v.UID == "" || b.ignored(v.UID) {
 				continue
 			}
 			labels := map[string]string{
@@ -147,6 +169,7 @@ func (b *BrickdCollector) Collect(ch chan<- prometheus.Metric) {
 				"brickd": b.Data.Address,
 				"id":     strconv.FormatInt(int64(v.DeviceID), 10),
 				"type":   DeviceName(v.DeviceID),
+				"sub_id": strconv.Itoa(v.SubID),
 			}
 
 			desc := prometheus.NewDesc(

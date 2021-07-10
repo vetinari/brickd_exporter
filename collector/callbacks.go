@@ -2,6 +2,7 @@ package collector
 
 import (
 	"fmt"
+
 	"github.com/Tinkerforge/go-api-bindings/ipconnection"
 	log "github.com/sirupsen/logrus"
 )
@@ -68,6 +69,9 @@ func (b *BrickdCollector) OnEnumerate(
 	deviceIdentifier uint16,
 	enumerationType ipconnection.EnumerationType) {
 
+	if b.ignored(uid) {
+		return
+	}
 	dev := &Device{
 		UID:             uid,
 		ConnectedUID:    connectedUid,
