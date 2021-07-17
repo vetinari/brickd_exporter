@@ -119,6 +119,16 @@ func (b *BrickdCollector) RegisterOutdoorWeatherBricklet(uid string) ([]Register
 				Value:    float64(windDirection),
 				Type:     prometheus.GaugeValue,
 			}
+			b.Values <- Value{
+				Index:    idx + 6,
+				DeviceID: outdoor_weather_bricklet.DeviceIdentifier,
+				UID:      uid,
+				SubID:    idx,
+				Help:     "Battery Status Low",
+				Name:     "battery_low",
+				Value:    bool2Float(batteryLow),
+				Type:     prometheus.GaugeValue,
+			}
 		})
 		reg = append(reg, Register{
 			Deregister: d.DeregisterStationDataCallback,
@@ -126,4 +136,11 @@ func (b *BrickdCollector) RegisterOutdoorWeatherBricklet(uid string) ([]Register
 		})
 	}
 	return reg, nil
+}
+
+func bool2Float(v bool) float64 {
+	if v {
+		return 1.0
+	}
+	return 0.0
 }
