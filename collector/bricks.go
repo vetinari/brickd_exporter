@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	// log "github.com/sirupsen/logrus"
+	"github.com/Tinkerforge/go-api-bindings/hat_zero_brick"
 	"github.com/Tinkerforge/go-api-bindings/master_brick"
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -65,6 +66,33 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
 		{
 			Deregister: m.DeregisterUSBVoltageCallback,
 			ID:         usbVID,
+		},
+	}, nil
+}
+
+func (b *BrickdCollector) RegisterZeroHatBrick(uid string) ([]Register, error) {
+	h, err := hat_zero_brick.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Zero Hat Brick (uid=%s): %s", uid, err)
+	}
+
+	vID := h.RegisterUSBVoltageCallback(func(current uint16) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: hat_zero_brick.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Voltage of the Zero Hat in V",
+			Name:     "hat_voltage",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(current) / 1000.0,
+		}
+	})
+	h.SetUSBVoltageCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	return []Register{
+		{
+			Deregister: h.DeregisterUSBVoltageCallback,
+			ID:         vID,
 		},
 	}, nil
 }
