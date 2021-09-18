@@ -16,7 +16,7 @@ go version 1.11 or later (go modules are used in this repo).
 ### Building the brickd exporter
 
 Clone the repository via `go get github.com/vetinari/brickd_exporter` or git and cd into the directory.
-Then build the brickd_exporter binary with the following commands.
+Then build the brickd\_exporter binary with the following commands.
 
     $ go build
 
@@ -51,6 +51,7 @@ Start with `--config.file /path/to/brickd.yml` to pass a config file.
 Bricks:
 
 * [Master Brick](https://www.tinkerforge.com/en/doc/Hardware/Bricks/Master_Brick.html)
+* [Zero Hat Brick](https://www.tinkerforge.com/de/doc/Hardware/Bricks/HAT_Zero_Brick.html)
 
 Bricklets:
 

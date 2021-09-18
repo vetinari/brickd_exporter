@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/Tinkerforge/go-api-bindings/ipconnection"
-	"github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 
 	// bricks:
+	"github.com/Tinkerforge/go-api-bindings/hat_zero_brick"
 	"github.com/Tinkerforge/go-api-bindings/master_brick"
 
 	// bricklets:
@@ -18,6 +18,7 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
 )
 
 // BrickdCollector does all the work
@@ -90,7 +91,9 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 	}
 	brickd.Devices = map[uint16]RegisterFunc{
 		// Bricks
-		master_brick.DeviceIdentifier: brickd.RegisterMasterBrick,
+		master_brick.DeviceIdentifier:   brickd.RegisterMasterBrick,
+		hat_zero_brick.DeviceIdentifier: brickd.RegisterZeroHatBrick,
+
 		// Bricklets
 		barometer_bricklet.DeviceIdentifier:    brickd.RegisterBarometerBricklet,
 		barometer_v2_bricklet.DeviceIdentifier: brickd.RegisterBarometerBricklet,
