@@ -136,10 +136,10 @@ func (b *BrickdCollector) Update() {
 	}()
 
 	for v := range b.Values {
-		b.Lock()
 		if b.ignored(v.UID) {
 			continue
 		}
+		b.Lock()
 		log.Debugf("received value from \"%s\" (uid=%s): %s=%f\n", DeviceName(v.DeviceID), v.UID, v.Name, v.Value)
 		if _, ok := b.Data.Values[v.UID]; !ok {
 			if v.DeviceID == outdoor_weather_bricklet.DeviceIdentifier {

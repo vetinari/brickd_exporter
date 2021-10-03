@@ -82,7 +82,7 @@ func (b *BrickdCollector) RegisterZeroHatBrick(uid string) ([]Register, error) {
 			DeviceID: hat_zero_brick.DeviceIdentifier,
 			UID:      uid,
 			Help:     "Voltage of the Zero Hat in V",
-			Name:     "hat_voltage",
+			Name:     "voltage",
 			Type:     prometheus.GaugeValue,
 			Value:    float64(current) / 1000.0,
 		}
