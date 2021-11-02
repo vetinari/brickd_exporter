@@ -1,9 +1,9 @@
 collector:
     log_level: debug
-    callback_period: 10s
+    callback_period: 15s
     ignored_uids:
     - v57
-    - 6eRtPG
+      #- 6eRtPG
 listen:
     address: :9639
     metrics_path: /metrics

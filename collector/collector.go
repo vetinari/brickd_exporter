@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"math"
 	"strconv"
 	"sync"
 	"time"
@@ -21,6 +22,10 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
 )
 
+const (
+	EthernetCallbackID uint64 = math.MaxUint64
+)
+
 // BrickdCollector does all the work
 type BrickdCollector struct {
 	sync.RWMutex
@@ -33,6 +38,7 @@ type BrickdCollector struct {
 	Devices        map[uint16]RegisterFunc
 	CallbackPeriod uint32
 	IgnoredUIDs    []string
+	EthernetState  chan interface{}
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
@@ -42,7 +48,7 @@ type RegisterFunc func(string) ([]Register, error)
 type BrickData struct {
 	Address string
 	Devices map[string]*Device
-	Values  map[string][]Value
+	Values  map[string]map[int]Value
 }
 
 // Value is returned from the callbacks
@@ -82,7 +88,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		Data: &BrickData{
 			Address: addr,
 			Devices: make(map[string]*Device),
-			Values:  make(map[string][]Value),
+			Values:  make(map[string]map[int]Value),
 		},
 		Registry:       make(map[string][]Register),
 		Values:         make(chan Value),
@@ -140,16 +146,13 @@ func (b *BrickdCollector) Update() {
 			continue
 		}
 		b.Lock()
-		log.Debugf("received value from \"%s\" (uid=%s): %s=%f\n", DeviceName(v.DeviceID), v.UID, v.Name, v.Value)
+		log.Debugf("received value from \"%s\" (uid=%s, sub=%d): %s=%f\n", DeviceName(v.DeviceID), v.UID, v.SubID, v.Name, v.Value)
 		if _, ok := b.Data.Values[v.UID]; !ok {
-			if v.DeviceID == outdoor_weather_bricklet.DeviceIdentifier {
-				b.Data.Values[v.UID] = make([]Value, 2*256*256) // ouch :)
-			} else {
-				b.Data.Values[v.UID] = make([]Value, 4)
-			}
+			b.Data.Values[v.UID] = make(map[int]Value)
 		}
 		b.Data.Values[v.UID][v.Index] = v
 		b.Unlock()
+		// log.Debugf("DATA=%#v", b.Data.Values)
 	}
 }
 
@@ -175,8 +178,15 @@ func (b *BrickdCollector) Collect(ch chan<- prometheus.Metric) {
 				"sub_id": strconv.Itoa(v.SubID),
 			}
 
+			var promType string
+			switch v.Type {
+			case prometheus.CounterValue:
+				promType = "total"
+			case prometheus.GaugeValue:
+				promType = "value"
+			}
 			desc := prometheus.NewDesc(
-				"brickd_"+v.Name+"_value", // FIXME do we have anything else than gauge?
+				"brickd_"+v.Name+"_"+promType,
 				v.Help,
 				nil,
 				labels,
