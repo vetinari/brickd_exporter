@@ -42,7 +42,7 @@ func (b *BrickdCollector) OnDisconnect(reason ipconnection.DisconnectReason) {
 	case ipconnection.DisconnectReasonShutdown:
 		why = "Disconnect initiated by Brick Daemon or WIFI/Ethernet Extension."
 	}
-	log.Info("disconnected from brickd: %s", why)
+	log.Infof("disconnected from brickd: %s", why)
 
 	b.Lock()
 	for _, dev := range b.Data.Devices {

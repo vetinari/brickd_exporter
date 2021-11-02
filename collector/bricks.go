@@ -2,11 +2,13 @@ package collector
 
 import (
 	"fmt"
+	"time"
 
-	// log "github.com/sirupsen/logrus"
 	"github.com/Tinkerforge/go-api-bindings/hat_zero_brick"
+	"github.com/Tinkerforge/go-api-bindings/ipconnection"
 	"github.com/Tinkerforge/go-api-bindings/master_brick"
 	"github.com/prometheus/client_golang/prometheus"
+	log "github.com/sirupsen/logrus"
 )
 
 func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
@@ -15,6 +17,14 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
 		return nil, fmt.Errorf("failed to connect Master Brick (uid=%s): %s", uid, err)
 	}
 
+	hasEthernet, err := m.IsEthernetPresent()
+	if err != nil {
+		hasEthernet = false
+	}
+	if hasEthernet {
+		log.Debugf("ethernet extension is present")
+		go b.PollEthernetState(m, uid)
+	}
 	currID := m.RegisterStackCurrentCallback(func(current uint16) {
 		b.Values <- Value{
 			Index:    0,
@@ -67,7 +77,59 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
 			Deregister: m.DeregisterUSBVoltageCallback,
 			ID:         usbVID,
 		},
+		{
+			Deregister: b.CloseEthernetState,
+			ID:         EthernetCallbackID,
+		},
 	}, nil
+}
+
+func (b *BrickdCollector) CloseEthernetState(_ uint64) {
+	close(b.EthernetState)
+}
+
+func (b *BrickdCollector) PollEthernetState(m master_brick.MasterBrick, uid string) {
+	b.EthernetState = make(chan interface{})
+	go func() {
+		select {
+		case <-b.EthernetState:
+			return
+		default:
+			for {
+				if b.Connection.GetConnectionState() != ipconnection.ConnectionStateConnected {
+					time.Sleep(time.Duration(b.CallbackPeriod) * time.Millisecond)
+					continue
+				}
+				_, _, _, _, rxCount, txCount, _, err := m.GetEthernetStatus()
+				log.Debugf("ethernet connected: rx %d / tx %d", rxCount, txCount)
+				if err != nil {
+					log.Infof("failed to get ethernet status: %s", err)
+					time.Sleep(time.Duration(b.CallbackPeriod) * time.Millisecond)
+					continue
+				}
+
+				b.Values <- Value{
+					Index:    3,
+					DeviceID: master_brick.DeviceIdentifier,
+					UID:      uid,
+					Help:     "Received bytes by Ethernet Extension",
+					Name:     "ethernet_received",
+					Type:     prometheus.CounterValue,
+					Value:    float64(rxCount),
+				}
+				b.Values <- Value{
+					Index:    4,
+					DeviceID: master_brick.DeviceIdentifier,
+					UID:      uid,
+					Help:     "Transmitted bytes by Ethernet Extension",
+					Name:     "ethernet_transmitted",
+					Type:     prometheus.CounterValue,
+					Value:    float64(txCount),
+				}
+				time.Sleep(time.Duration(b.CallbackPeriod) * time.Millisecond)
+			}
+		}
+	}()
 }
 
 func (b *BrickdCollector) RegisterZeroHatBrick(uid string) ([]Register, error) {
@@ -82,7 +144,7 @@ func (b *BrickdCollector) RegisterZeroHatBrick(uid string) ([]Register, error) {
 			DeviceID: hat_zero_brick.DeviceIdentifier,
 			UID:      uid,
 			Help:     "Voltage of the Zero Hat in V",
-			Name:     "hat_voltage",
+			Name:     "voltage",
 			Type:     prometheus.GaugeValue,
 			Value:    float64(current) / 1000.0,
 		}
