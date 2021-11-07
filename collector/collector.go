@@ -38,6 +38,8 @@ type BrickdCollector struct {
 	Devices        map[uint16]RegisterFunc
 	CallbackPeriod uint32
 	IgnoredUIDs    []string
+	Labels         map[string]string
+	SensorLabels   map[string]map[string]map[string]string
 	EthernetState  chan interface{}
 }
 
@@ -56,7 +58,7 @@ type Value struct {
 	Index    int                  // index in BrickData.Values, needs to be assigned by the callback
 	DeviceID uint16               // https://www.tinkerforge.com/en/doc/Software/Device_Identifier.html
 	UID      string               // UID as given from brickd
-	SubID    int                  // sub id in outdoor_weather_bricklet
+	SensorID int                  // sensor id in outdoor_weather_bricklet
 	Type     prometheus.ValueType // probably just prometheus.GaugeValue
 	Help     string               // help for users, i.e. prometheus' "# HELP brickd_humidity_value ..." line, (just the help text)
 	Name     string               // value name, such as "usb_voltage" or "humidity"
@@ -81,7 +83,7 @@ type Device struct {
 }
 
 // NewCollector creates a new collector for the given address (and authenticates with the password)
-func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []string) *BrickdCollector {
+func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []string, labels map[string]string, sensorLabels map[string]map[string]map[string]string) *BrickdCollector {
 	brickd := &BrickdCollector{
 		Address:  addr,
 		Password: password,
@@ -94,6 +96,8 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		Values:         make(chan Value),
 		CallbackPeriod: uint32(cbPeriod / time.Millisecond),
 		IgnoredUIDs:    ignoredUIDs,
+		Labels:         labels,
+		SensorLabels:   sensorLabels,
 	}
 	brickd.Devices = map[uint16]RegisterFunc{
 		// Bricks
@@ -146,7 +150,7 @@ func (b *BrickdCollector) Update() {
 			continue
 		}
 		b.Lock()
-		log.Debugf("received value from \"%s\" (uid=%s, sub=%d): %s=%f\n", DeviceName(v.DeviceID), v.UID, v.SubID, v.Name, v.Value)
+		log.Debugf("received value from \"%s\" (uid=%s, sensor=%d): %s=%f\n", DeviceName(v.DeviceID), v.UID, v.SensorID, v.Name, v.Value)
 		if _, ok := b.Data.Values[v.UID]; !ok {
 			b.Data.Values[v.UID] = make(map[int]Value)
 		}
@@ -171,11 +175,28 @@ func (b *BrickdCollector) Collect(ch chan<- prometheus.Metric) {
 				continue
 			}
 			labels := map[string]string{
-				"uid":    v.UID,
-				"brickd": b.Data.Address,
-				"id":     strconv.FormatInt(int64(v.DeviceID), 10),
-				"type":   DeviceName(v.DeviceID),
-				"sub_id": strconv.Itoa(v.SubID),
+				"uid":       v.UID,
+				"brickd":    b.Data.Address,
+				"id":        strconv.FormatInt(int64(v.DeviceID), 10),
+				"type":      DeviceName(v.DeviceID),
+				"sub_id":    strconv.Itoa(v.SensorID), // deprecated
+				"sensor_id": strconv.Itoa(v.SensorID),
+			}
+			for k, v := range b.Labels {
+				if _, exists := labels[k]; exists {
+					continue
+				}
+				labels[k] = v
+			}
+			if sl, ok := b.SensorLabels[v.UID]; ok {
+				if l, ok := sl[strconv.Itoa(v.SensorID)]; ok {
+					for k, v := range l {
+						if _, exists := labels[k]; exists {
+							continue
+						}
+						labels[k] = v
+					}
+				}
 			}
 
 			var promType string

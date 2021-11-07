@@ -32,9 +32,11 @@ type BrickdConfig struct {
 }
 
 type CollectorConfig struct {
-	LogLevel       string        `yaml:"log_level"`
-	CallbackPeriod time.Duration `yaml:"callback_period"`
-	IgnoredUIDs    []string      `yaml:"ignored_uids"`
+	LogLevel       string                                  `yaml:"log_level"`
+	CallbackPeriod time.Duration                           `yaml:"callback_period"`
+	IgnoredUIDs    []string                                `yaml:"ignored_uids"`
+	Labels         map[string]string                       `yaml:"labels"`
+	SensorLabels   map[string]map[string]map[string]string `yaml:"sensor_labels"`
 }
 
 func parseConfig() (*LocalConfig, error) {
