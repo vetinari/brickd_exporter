@@ -25,6 +25,7 @@ func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
 		log.Debugf("ethernet extension is present")
 		go b.PollEthernetState(m, uid)
 	}
+
 	currID := m.RegisterStackCurrentCallback(func(current uint16) {
 		b.Values <- Value{
 			Index:    0,

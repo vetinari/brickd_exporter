@@ -7,6 +7,10 @@ connected bricks and bricklets.
 Data from the brickd is collected in the background. Currently callbackPeriod is set to 10,000 ms, which can
 be changed in the config.
 
+Note: the `sub_id` label has been deprecated, it is replaced by the `sensor_id` label in the metrics and
+will be removed in the future.
+
+
 ## Usage
 
 ### Pre-requisite
@@ -41,6 +45,12 @@ on local USB port.
 
 `collector.log_level` can be set to `debug` to see the devices discovered and their values received
 from the callbacks.
+
+`collector.labels` is a key -> value map of strings which will be applied to all metrics.
+
+`collector.sensor_labels` is a mapping of the UID of the brick(let), to sensor id (as string, usually
+`"0"` for all except with the "Outdoor Weather Bricklet" to a key -> value map of strings, see [brickd.yml]
+for examples. Those will only applied to the defined sensors.
 
 ### Running
 

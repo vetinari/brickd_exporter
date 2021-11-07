@@ -3,7 +3,19 @@ collector:
     callback_period: 15s
     ignored_uids:
     - v57
-      #- 6eRtPG
+    labels:
+        location: "Berlin, DE"
+    sensor_labels:
+        SDm:
+            "117504":
+                name: "Outdoor"
+            "28416":
+                name: "Living Room"
+            "65024":
+                name: "Basement"
+        xyV:
+            "0":
+                name: "Living Room"
 listen:
     address: :9639
     metrics_path: /metrics
