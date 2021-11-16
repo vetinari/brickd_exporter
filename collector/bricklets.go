@@ -50,7 +50,7 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(uid string) ([]Register, er
 			DeviceID: air_quality_bricklet.DeviceIdentifier,
 			UID:      uid,
 			Help:     "Air Pressure in hPa",
-			Name:     "temperature",
+			Name:     "pressure",
 			Type:     prometheus.GaugeValue,
 			Value:    float64(airPressure) / 100,
 		}
