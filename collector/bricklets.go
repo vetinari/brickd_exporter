@@ -54,6 +54,15 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(uid string) ([]Register, er
 			Type:     prometheus.GaugeValue,
 			Value:    float64(airPressure) / 100,
 		}
+		b.Values <- Value{
+			Index:    4,
+			DeviceID: air_quality_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Humidity of the air in %rH",
+			Name:     "humidity",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(humidity) / 100,
+		}
 
 	})
 	if err := d.SetAllValuesCallbackConfiguration(b.CallbackPeriod, false); err != nil {
