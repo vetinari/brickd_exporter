@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Tinkerforge/go-api-bindings/air_quality_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/ipconnection"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
@@ -105,6 +106,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		hat_zero_brick.DeviceIdentifier: brickd.RegisterZeroHatBrick,
 
 		// Bricklets
+		air_quality_bricklet.DeviceIdentifier:  brickd.RegisterAirQualityBricklet,
 		barometer_bricklet.DeviceIdentifier:    brickd.RegisterBarometerBricklet,
 		barometer_v2_bricklet.DeviceIdentifier: brickd.RegisterBarometerBricklet,
 		humidity_bricklet.DeviceIdentifier:     brickd.RegisterHumidityBricklet,

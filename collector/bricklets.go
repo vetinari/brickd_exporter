@@ -3,12 +3,78 @@ package collector
 import (
 	"fmt"
 
+	"github.com/Tinkerforge/go-api-bindings/air_quality_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
 )
+
+func (b *BrickdCollector) RegisterAirQualityBricklet(uid string) ([]Register, error) {
+	d, err := air_quality_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Air Quality Bricklet (uid=%s): %s", uid, err)
+	}
+
+	cbID := d.RegisterAllValuesCallback(func(iaqIndex int32, iaqIndexAccuracy uint8, temperature int32, humidity int32, airPressure int32) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: air_quality_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "IAQ Index Value",
+			Name:     "iaq_index",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(iaqIndex),
+		}
+		b.Values <- Value{
+			Index:    1,
+			DeviceID: air_quality_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "IAQ Index Accuracy",
+			Name:     "iaq_index_accuracy",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(iaqIndexAccuracy),
+		}
+		b.Values <- Value{
+			Index:    2,
+			DeviceID: air_quality_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Temperature of the air in °C",
+			Name:     "temperature",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(temperature) / 100,
+		}
+		b.Values <- Value{
+			Index:    3,
+			DeviceID: air_quality_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Air Pressure in hPa",
+			Name:     "pressure",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(airPressure) / 100,
+		}
+		b.Values <- Value{
+			Index:    4,
+			DeviceID: air_quality_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Humidity of the air in %rH",
+			Name:     "humidity",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(humidity) / 100,
+		}
+
+	})
+	if err := d.SetAllValuesCallbackConfiguration(b.CallbackPeriod, false); err != nil {
+		return nil, fmt.Errorf("failed to set callback config for Air Quality Bricklet (uid=%s): %s", uid, err)
+	}
+	return []Register{
+		{
+			Deregister: d.DeregisterAllValuesCallback,
+			ID:         cbID,
+		},
+	}, nil
+}
 
 func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, error) {
 	d, err := humidity_bricklet.New(uid, &b.Connection)
@@ -18,6 +84,7 @@ func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, erro
 
 	callbackID := d.RegisterHumidityCallback(func(humidity uint16) {
 		b.Values <- Value{
+			Index:    0,
 			DeviceID: humidity_bricklet.DeviceIdentifier,
 			UID:      uid,
 			Help:     "Humidity of the air in %rF",
