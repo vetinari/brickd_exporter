@@ -107,7 +107,7 @@ func (b *BrickdCollector) RegisterOutdoorWeatherBricklet(uid string) ([]Register
 				Help:     "Rain in mm",
 				Name:     "rain",
 				Value:    float64(rain) / 10.0,
-				Type:     prometheus.GaugeValue,
+				Type:     prometheus.CounterValue,
 			}
 			b.Values <- Value{
 				Index:    idx + 5,
