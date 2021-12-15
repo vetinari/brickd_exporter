@@ -49,7 +49,7 @@ from the callbacks.
 `collector.labels` is a key -> value map of strings which will be applied to all metrics.
 
 `collector.sensor_labels` is a mapping of the UID of the brick(let), to sensor id (as string, usually
-`"0"` for all except with the "Outdoor Weather Bricklet" to a key -> value map of strings, see [brickd.yml]
+`"0"` for all except with the "Outdoor Weather Bricklet" to a key -> value map of strings, see [brickd.yml](brickd.yml)
 for examples. Those will only applied to the defined sensors.
 
 ### Running
