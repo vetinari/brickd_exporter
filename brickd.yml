@@ -16,6 +16,7 @@ collector:
         xyV:
             "0":
                 name: "Living Room"
+    expire_period: 2m
 listen:
     address: :9639
     metrics_path: /metrics
