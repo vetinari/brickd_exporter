@@ -32,6 +32,7 @@ func main() {
 		config.Collector.IgnoredUIDs,
 		config.Collector.Labels,
 		config.Collector.SensorLabels,
+		config.Collector.Expire,
 	)
 
 	prometheus.MustRegister(c)

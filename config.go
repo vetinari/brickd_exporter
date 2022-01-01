@@ -37,6 +37,7 @@ type CollectorConfig struct {
 	IgnoredUIDs    []string                                `yaml:"ignored_uids"`
 	Labels         map[string]string                       `yaml:"labels"`
 	SensorLabels   map[string]map[string]map[string]string `yaml:"sensor_labels"`
+	Expire         time.Duration                           `yaml:"expire_period"`
 }
 
 func parseConfig() (*LocalConfig, error) {
@@ -72,6 +73,7 @@ func defaultConfig() (*LocalConfig, error) {
 		Collector: CollectorConfig{
 			LogLevel:       "info",
 			CallbackPeriod: 10 * time.Second,
+			Expire:         0,
 		},
 	}, nil
 }

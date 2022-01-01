@@ -42,6 +42,7 @@ type BrickdCollector struct {
 	Labels         map[string]string
 	SensorLabels   map[string]map[string]map[string]string
 	EthernetState  chan interface{}
+	ExpirePeriod   time.Duration
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
@@ -64,6 +65,7 @@ type Value struct {
 	Help     string               // help for users, i.e. prometheus' "# HELP brickd_humidity_value ..." line, (just the help text)
 	Name     string               // value name, such as "usb_voltage" or "humidity"
 	Value    float64              // the measurement value
+	Received time.Time            // when the value was received
 }
 
 // Register is a callback register, the Deregister func will be called as reg.Deregister(reg.ID)
@@ -84,7 +86,10 @@ type Device struct {
 }
 
 // NewCollector creates a new collector for the given address (and authenticates with the password)
-func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []string, labels map[string]string, sensorLabels map[string]map[string]map[string]string) *BrickdCollector {
+func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []string,
+	labels map[string]string, sensorLabels map[string]map[string]map[string]string,
+	expirePeriod time.Duration) *BrickdCollector {
+
 	brickd := &BrickdCollector{
 		Address:  addr,
 		Password: password,
@@ -99,6 +104,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		IgnoredUIDs:    ignoredUIDs,
 		Labels:         labels,
 		SensorLabels:   sensorLabels,
+		ExpirePeriod:   expirePeriod,
 	}
 	brickd.Devices = map[uint16]RegisterFunc{
 		// Bricks
@@ -147,10 +153,15 @@ func (b *BrickdCollector) Update() {
 		}
 	}()
 
+	if b.ExpirePeriod != 0 {
+		go b.expireValues()
+	}
+
 	for v := range b.Values {
 		if b.ignored(v.UID) {
 			continue
 		}
+		v.Received = time.Now()
 		b.Lock()
 		log.Debugf("received value from \"%s\" (uid=%s, sensor=%d): %s=%f\n", DeviceName(v.DeviceID), v.UID, v.SensorID, v.Name, v.Value)
 		if _, ok := b.Data.Values[v.UID]; !ok {
@@ -159,6 +170,24 @@ func (b *BrickdCollector) Update() {
 		b.Data.Values[v.UID][v.Index] = v
 		b.Unlock()
 		// log.Debugf("DATA=%#v", b.Data.Values)
+	}
+}
+
+func (b *BrickdCollector) expireValues() {
+	log.Debugf("expiring values every %s", b.ExpirePeriod)
+	for {
+		time.Sleep(b.ExpirePeriod)
+		b.Lock()
+		expireDate := time.Now().Add(-1 * b.ExpirePeriod)
+		for uid := range b.Data.Values {
+			for i := range b.Data.Values[uid] {
+				if b.Data.Values[uid][i].Received.Before(expireDate) {
+					log.Debugf("expiring value uid=%s index=%d ts=%s", uid, i, b.Data.Values[uid][i].Received)
+					delete(b.Data.Values[uid], i)
+				}
+			}
+		}
+		b.Unlock()
 	}
 }
 
