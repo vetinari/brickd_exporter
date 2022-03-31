@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Tinkerforge/go-api-bindings/air_quality_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/analog_in_v3_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
@@ -74,6 +75,38 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(uid string) ([]Register, er
 			ID:         cbID,
 		},
 	}, nil
+}
+
+func (b *BrickdCollector) RegisterAnalogInV3Bricklet(uid string) ([]Register, error) {
+	d, err := analog_in_v3_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect AnalogInV3 Bricklet (uid=%s): %s", uid, err)
+	}
+
+	callbackID := d.RegisterVoltageCallback(func(voltage uint16) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: analog_in_v3_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Voltage in %rV",
+			Name:     "voltage",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(voltage) / 1000.0,
+		}
+	})
+
+	// set period to b.CallbackPeriod
+	// valueHasToChange to false to also collect metrics if voltage is stable
+	// Threshold is turned off and min/max zero to always collect metrics in fixed period
+	d.SetVoltageCallbackConfiguration(b.CallbackPeriod, false, 'x', 0, 0)
+
+	return []Register{
+		{
+			Deregister: d.DeregisterVoltageCallback,
+			ID:         callbackID,
+		},
+	}, nil
+
 }
 
 func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, error) {
