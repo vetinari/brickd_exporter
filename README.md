@@ -71,6 +71,7 @@ Bricks:
 
 Bricklets:
 
+* [Analog In V3 Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Analog_In_V3.html)
 * [AirQuality Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Air_Quality.html)
 * [Barometer Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Barometer.html)
 * [Barometer Bricklet v2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Barometer_V2.html)
