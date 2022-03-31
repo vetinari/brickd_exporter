@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Tinkerforge/go-api-bindings/hat_brick"
 	"github.com/Tinkerforge/go-api-bindings/hat_zero_brick"
 	"github.com/Tinkerforge/go-api-bindings/ipconnection"
 	"github.com/Tinkerforge/go-api-bindings/master_brick"
@@ -156,6 +157,42 @@ func (b *BrickdCollector) RegisterZeroHatBrick(uid string) ([]Register, error) {
 		{
 			Deregister: h.DeregisterUSBVoltageCallback,
 			ID:         vID,
+		},
+	}, nil
+}
+
+func (b *BrickdCollector) RegisterHatBrick(uid string) ([]Register, error) {
+	h, err := hat_brick.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Hat Brick (uid=%s): %s", uid, err)
+	}
+
+	callbackID := h.RegisterVoltagesCallback(func(voltageUSB uint16, voltageDC uint16) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: hat_brick.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Voltage of the Hat USB in V",
+			Name:     "voltage_usb",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(voltageUSB) / 1000.0,
+		}
+		b.Values <- Value{
+			Index:    1,
+			DeviceID: hat_brick.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Voltage of the Hat DC in V",
+			Name:     "voltage_dc",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(voltageDC) / 1000.0,
+		}
+	})
+	h.SetVoltagesCallbackConfiguration(b.CallbackPeriod, false)
+
+	return []Register{
+		{
+			Deregister: h.DeregisterVoltagesCallback,
+			ID:         callbackID,
 		},
 	}, nil
 }
