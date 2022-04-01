@@ -8,6 +8,7 @@ import (
 
 	"github.com/Tinkerforge/go-api-bindings/air_quality_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/analog_in_v3_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/hat_brick"
 	"github.com/Tinkerforge/go-api-bindings/ipconnection"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
@@ -111,6 +112,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		// Bricks
 		master_brick.DeviceIdentifier:   brickd.RegisterMasterBrick,
 		hat_zero_brick.DeviceIdentifier: brickd.RegisterZeroHatBrick,
+		hat_brick.DeviceIdentifier:      brickd.RegisterHatBrick,
 
 		// Bricklets
 		analog_in_v3_bricklet.DeviceIdentifier: brickd.RegisterAnalogInV3Bricklet,

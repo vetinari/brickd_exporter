@@ -68,6 +68,7 @@ Bricks:
 
 * [Master Brick](https://www.tinkerforge.com/en/doc/Hardware/Bricks/Master_Brick.html)
 * [Zero Hat Brick](https://www.tinkerforge.com/de/doc/Hardware/Bricks/HAT_Zero_Brick.html)
+* [Hat Brick](https://www.tinkerforge.com/en/doc/Hardware/Bricks/HAT_Brick.html)
 
 Bricklets:
 
