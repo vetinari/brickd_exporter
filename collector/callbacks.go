@@ -28,6 +28,11 @@ func (b *BrickdCollector) OnConnect(reason ipconnection.DisconnectReason) {
 		log.Debugf("Authentication succeded")
 	}
 	b.Connection.SetAutoReconnect(true)
+
+	b.Lock()
+	b.ConnectCounter += 1
+	b.Unlock()
+
 	b.Connection.Enumerate() // call now, so we get devices when we initially connect
 }
 
