@@ -45,6 +45,7 @@ type BrickdCollector struct {
 	SensorLabels   map[string]map[string]map[string]string
 	EthernetState  chan interface{}
 	ExpirePeriod   time.Duration
+	ConnectCounter int64
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
@@ -147,7 +148,15 @@ func (b *BrickdCollector) Update() {
 	b.Connection.RegisterDisconnectCallback(b.OnDisconnect)
 	b.Connection.RegisterConnectCallback(b.OnConnect)
 
-	b.Connection.Connect(b.Address) // Connect to brickd.
+	// Connect to brickd.
+	for {
+		err := b.Connection.Connect(b.Address)
+		if err == nil {
+			break
+		}
+		log.Infof("failed to connect to %s: %s", b.Address, err)
+		time.Sleep(time.Second)
+	}
 	defer b.Connection.Disconnect()
 
 	go func() { // discover eventually new bricks / bricklets on the brickd
@@ -204,6 +213,20 @@ func (b *BrickdCollector) Describe(ch chan<- *prometheus.Desc) {
 func (b *BrickdCollector) Collect(ch chan<- prometheus.Metric) {
 	b.RLock()
 	defer b.RUnlock()
+	desc := prometheus.NewDesc(
+		"brickd_connections_total",
+		"Number of connections to brickd",
+		nil,
+		map[string]string{
+			"brickd": b.Data.Address,
+		},
+	)
+	ch <- prometheus.MustNewConstMetric(
+		desc,
+		prometheus.CounterValue,
+		float64(b.ConnectCounter),
+	)
+
 	for _, vals := range b.Data.Values {
 		for _, v := range vals {
 			if v.UID == "" || b.ignored(v.UID) {
