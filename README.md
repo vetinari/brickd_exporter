@@ -2,7 +2,7 @@
 
 The brickd exporter is a Prometheus exporter which connects to a [Tinkerforge](https://www.tinkerforge.com/)
 [brickd](https://www.tinkerforge.com/en/doc/Software/Brickd.html) and exports the values from the
-connected bricks and bricklets. It can additionally send the data to an MQTT broker, see [#mqtt](MQTT) section
+connected bricks and bricklets. It can additionally send the data to an MQTT broker, see [./README.md#mqtt](MQTT) section
 on how to configure the broker and topics.
 
 Data from the brickd is collected in the background. Currently callbackPeriod is set to 10,000 ms, which can
