@@ -7,18 +7,32 @@ collector:
         location: "Berlin, DE"
     sensor_labels:
         SDm:
-            "117504":
+            "112640":
                 name: "Outdoor"
-            "28416":
+                mqtt_topic: "berlin/outdoor"
+            "19712":
                 name: "Living Room"
-            "65024":
-                name: "Basement"
+                mqtt_topic: "berlin/livingroom"
+            "48384":
+                name: "Bathroom"
+                mqtt_topic: "berlin/bathroom"
         xyV:
             "0":
                 name: "Living Room"
+                mqtt_topic: "berlin/livingroom"
     expire_period: 2m
 listen:
     address: :9639
     metrics_path: /metrics
 brickd:
     address: hide-park:4223
+mqtt:
+  enabled: true
+  broker:
+    host: library
+    port: 1883
+    username: brickd
+    password: brickd_pass
+    client_id: brickd_exporter
+  topic: brickd/
+
