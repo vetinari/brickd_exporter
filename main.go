@@ -33,6 +33,7 @@ func main() {
 		config.Collector.Labels,
 		config.Collector.SensorLabels,
 		config.Collector.Expire,
+		config.MQTT,
 	)
 
 	prometheus.MustRegister(c)

@@ -12,6 +12,7 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/ipconnection"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
+	"github.com/vetinari/brickd_exporter/mqtt"
 
 	// bricks:
 	"github.com/Tinkerforge/go-api-bindings/hat_zero_brick"
@@ -46,6 +47,7 @@ type BrickdCollector struct {
 	EthernetState  chan interface{}
 	ExpirePeriod   time.Duration
 	ConnectCounter int64
+	MQTT           *mqtt.MQTT
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
@@ -91,7 +93,7 @@ type Device struct {
 // NewCollector creates a new collector for the given address (and authenticates with the password)
 func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []string,
 	labels map[string]string, sensorLabels map[string]map[string]map[string]string,
-	expirePeriod time.Duration) *BrickdCollector {
+	expirePeriod time.Duration, mq *mqtt.MQTT) *BrickdCollector {
 
 	brickd := &BrickdCollector{
 		Address:  addr,
@@ -108,6 +110,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		Labels:         labels,
 		SensorLabels:   sensorLabels,
 		ExpirePeriod:   expirePeriod,
+		MQTT:           mq,
 	}
 	brickd.Devices = map[uint16]RegisterFunc{
 		// Bricks
@@ -127,6 +130,16 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 	}
 
 	go brickd.Update()
+
+	if brickd.MQTT.Enabled {
+		var err error
+		brickd.MQTT.Client, err = mqtt.NewClient(brickd.MQTT.Broker)
+		if err != nil {
+			log.Warnf("failed to create MQTT client: %s", err)
+		} else {
+			go brickd.ExportMQTT()
+		}
+	}
 	return brickd
 }
 
@@ -246,9 +259,13 @@ func (b *BrickdCollector) Collect(ch chan<- prometheus.Metric) {
 				}
 				labels[k] = v
 			}
+
 			if sl, ok := b.SensorLabels[v.UID]; ok {
 				if l, ok := sl[strconv.Itoa(v.SensorID)]; ok {
 					for k, v := range l {
+						if k == "mqtt_topic" {
+							continue
+						}
 						if _, exists := labels[k]; exists {
 							continue
 						}

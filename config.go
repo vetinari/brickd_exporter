@@ -6,6 +6,7 @@ import (
 	"time"
 
 	flag "github.com/spf13/pflag"
+	"github.com/vetinari/brickd_exporter/mqtt"
 	"gopkg.in/yaml.v2"
 )
 
@@ -18,6 +19,7 @@ type LocalConfig struct {
 	Listen    ListenConfig    `yaml:"listen"`
 	Brickd    BrickdConfig    `yaml:"brickd"`
 	Collector CollectorConfig `yaml:"collector"`
+	MQTT      *mqtt.MQTT      `yaml:"mqtt"`
 }
 
 type ListenConfig struct {
@@ -74,6 +76,10 @@ func defaultConfig() (*LocalConfig, error) {
 			LogLevel:       "info",
 			CallbackPeriod: 10 * time.Second,
 			Expire:         0,
+		},
+		MQTT: &mqtt.MQTT{
+			Enabled: false,
+			Topic:   "brickd/",
 		},
 	}, nil
 }

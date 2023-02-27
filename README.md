@@ -2,14 +2,14 @@
 
 The brickd exporter is a Prometheus exporter which connects to a [Tinkerforge](https://www.tinkerforge.com/)
 [brickd](https://www.tinkerforge.com/en/doc/Software/Brickd.html) and exports the values from the
-connected bricks and bricklets.
+connected bricks and bricklets. It can additionally send the data to an MQTT broker, see [#mqtt](MQTT) section
+on how to configure the broker and topics.
 
 Data from the brickd is collected in the background. Currently callbackPeriod is set to 10,000 ms, which can
 be changed in the config.
 
 Note: the `sub_id` label has been deprecated, it is replaced by the `sensor_id` label in the metrics and
 will be removed in the future.
-
 
 ## Usage
 
@@ -39,6 +39,9 @@ listen:
     metrics_path: /metrics
 brickd:
     address: localhost:4223
+mqtt:
+    enabled: false
+    topic: "brickd/"
 ```
 
 Any of these values can be set. Use the default `brickd.address` when the bricks are connected
@@ -57,6 +60,32 @@ for examples. Those will only applied to the defined sensors.
 brick / bricklet has been received from brickd more than this period ago it will not be shown anymore. `0s` (or any other
 `time.Duration` of `0` disables this feature (the default). Do not set this too low or you might not export anything :) 
 Depending on your use case 2 or more times the `collector.callback_period` should be OK.
+
+### MQTT
+
+The MQTT broker is configured in the *mqtt* section. An example config looks like:
+```yaml
+mqtt:
+  enabled: true
+  broker:
+    host: 192.168.5.33
+    port: 1883
+    username: brickd
+    password: brickd_pass
+    client_id: brickd_exporter
+  topic: brickd/
+```
+
+**Note**: if you're running multiple brickd exporter each one must get a unique `client_id`.
+
+The `mqtt.topic` sets the base topic where each metric is reported to. The target topic (key 
+`mqtt_topic`) for the metrics are per device uid + sensor id configured in the `collector.sensor_labels`.
+Check the supplied [brickd.yml](example config) how this is done. Note: the `mqtt_topic` will
+not be in the labels (not in prometheus and not in the MQTT payload).
+
+
+The "Master Brick", "HAT Brick" and "HAT Zero Brick" values are reported in the topics `master_brick`, 
+`hat_brick` and `hat_zero_brick` topics respectively (prefixed by `mqtt.topic` of course).
 
 ### Running
 
