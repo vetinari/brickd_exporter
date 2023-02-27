@@ -2,7 +2,7 @@
 
 The brickd exporter is a Prometheus exporter which connects to a [Tinkerforge](https://www.tinkerforge.com/)
 [brickd](https://www.tinkerforge.com/en/doc/Software/Brickd.html) and exports the values from the
-connected bricks and bricklets. It can additionally send the data to an MQTT broker, see MQTT section
+connected bricks and bricklets. It can additionally send the data to an MQTT broker, see [MQTT](#mqtt) section
 on how to configure the broker and topics.
 
 Data from the brickd is collected in the background. Currently callbackPeriod is set to 10,000 ms, which can
@@ -80,7 +80,7 @@ mqtt:
 
 The `mqtt.topic` sets the base topic where each metric is reported to. The target topic (key 
 `mqtt_topic`) for the metrics are per device uid + sensor id configured in the `collector.sensor_labels`.
-Check the supplied [brickd.yml](example config) how this is done. Note: the `mqtt_topic` will
+Check the supplied [example config](brickd.yml) how this is done. Note: the `mqtt_topic` will
 not be in the labels (not in prometheus and not in the MQTT payload).
 
 
