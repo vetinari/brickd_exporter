@@ -15,7 +15,7 @@ will be removed in the future.
 
 ### Pre-requisite
 
-go version 1.11 or later (go modules are used in this repo).
+go version 1.19 or later (go modules are used in this repo).
 
 ### Building the brickd exporter
 
