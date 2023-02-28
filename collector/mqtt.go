@@ -10,10 +10,10 @@ import (
 )
 
 // Collect is part of the prometheus.Collector interface
-func (b *BrickdCollector) ExportMQTT() {
+func (b *BrickdCollector) ExportMQTT(interval time.Duration) {
 	for {
 		b.exportMQTTOnce()
-		time.Sleep(time.Minute)
+		time.Sleep(interval)
 	}
 }
 
