@@ -137,7 +137,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		if err != nil {
 			log.Warnf("failed to create MQTT client: %s", err)
 		} else {
-			go brickd.ExportMQTT()
+			go brickd.ExportMQTT(cbPeriod)
 		}
 	}
 	return brickd
