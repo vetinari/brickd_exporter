@@ -122,7 +122,7 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		analog_in_v3_bricklet.DeviceIdentifier: brickd.RegisterAnalogInV3Bricklet,
 		air_quality_bricklet.DeviceIdentifier:  brickd.RegisterAirQualityBricklet,
 		barometer_bricklet.DeviceIdentifier:    brickd.RegisterBarometerBricklet,
-		barometer_v2_bricklet.DeviceIdentifier: brickd.RegisterBarometerBricklet,
+		barometer_v2_bricklet.DeviceIdentifier: brickd.RegisterBarometerV2Bricklet,
 		humidity_bricklet.DeviceIdentifier:     brickd.RegisterHumidityBricklet,
 		humidity_v2_bricklet.DeviceIdentifier:  brickd.RegisterHumidityV2Bricklet,
 
