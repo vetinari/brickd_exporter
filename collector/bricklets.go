@@ -240,7 +240,7 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 			Help:     "Air Pressure in hPa",
 			Name:     "air_pressure",
 			Type:     prometheus.GaugeValue,
-			Value:    float64(airPressure) * 1000.0,
+			Value:    float64(airPressure) / 1000.0,
 		}
 	})
 	d.SetAirPressureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
@@ -253,7 +253,7 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 			Help:     "Altitude in m",
 			Name:     "altitude",
 			Type:     prometheus.GaugeValue,
-			Value:    float64(altitude) * 1000.0,
+			Value:    float64(altitude) / 1000.0,
 		}
 	})
 	d.SetAltitudeCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
@@ -263,10 +263,10 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 			Index:    2,
 			DeviceID: barometer_v2_bricklet.DeviceIdentifier,
 			UID:      uid,
-			Help:     "Temperature in °C",
-			Name:     "temperature",
+			Help:     "Temperature of the bricklet in °C",
+			Name:     "bricklet_temperature",
 			Type:     prometheus.GaugeValue,
-			Value:    float64(temperature) * 100.0,
+			Value:    float64(temperature) / 100.0,
 		}
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
