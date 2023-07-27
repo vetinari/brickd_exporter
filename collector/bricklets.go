@@ -9,6 +9,8 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/co2_v2_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -276,6 +278,94 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 		{
 			Deregister: d.DeregisterAltitudeCallback,
 			ID:         altID,
+		},
+		{
+			Deregister: d.DeregisterTemperatureCallback,
+			ID:         tempID,
+		},
+	}, nil
+}
+
+func (b *BrickdCollector) RegisterAmbientLightV3Bricklet(uid string) ([]Register, error) {
+	d, err := ambient_light_v3_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Ambient Light V3.0 (uid=%s): %s", uid, err)
+	}
+
+	ilID := d.RegisterIlluminanceCallback(func(illuminance uint32) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: ambient_light_v3_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Illuminance in Luxa",
+			Name:     "illuminance",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(illuminance) / 100,
+		}
+	})
+	d.SetIlluminanceCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	return []Register{
+		{
+			Deregister: d.DeregisterIlluminanceCallback,
+			ID:         ilID,
+		},
+	}, nil
+}
+
+func (b *BrickdCollector) RegisterCO2V2Bricklet(uid string) ([]Register, error) {
+	d, err := co2_v2_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Barometer Bricklet V2.0 (uid=%s): %s", uid, err)
+	}
+
+	coID := d.RegisterCO2ConcentrationCallback(func(co2Concentration uint16) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: co2_v2_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "CO2 Concentration in PPM",
+			Name:     "co2_concentration",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(co2Concentration),
+		}
+	})
+	d.SetCO2ConcentrationCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	huID := d.RegisterHumidityCallback(func(humidity uint16) {
+		b.Values <- Value{
+			Index:    1,
+			DeviceID: co2_v2_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Humidity of the air in %rF",
+			Name:     "humidity",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(humidity) / 100,
+		}
+	})
+	d.SetHumidityCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	tempID := d.RegisterTemperatureCallback(func(temperature int16) {
+		b.Values <- Value{
+			Index:    2,
+			DeviceID: co2_v2_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "Temperature in °C",
+			Name:     "temperature",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(temperature) / 100,
+		}
+	})
+	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	return []Register{
+		{
+			Deregister: d.DeregisterCO2ConcentrationCallback,
+			ID:         coID,
+		},
+		{
+			Deregister: d.DeregisterHumidityCallback,
+			ID:         huID,
 		},
 		{
 			Deregister: d.DeregisterTemperatureCallback,
