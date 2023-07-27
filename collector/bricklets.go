@@ -11,6 +11,7 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/co2_v2_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/uv_light_v2_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -370,6 +371,33 @@ func (b *BrickdCollector) RegisterCO2V2Bricklet(uid string) ([]Register, error) 
 		{
 			Deregister: d.DeregisterTemperatureCallback,
 			ID:         tempID,
+		},
+	}, nil
+}
+
+func (b *BrickdCollector) RegisterUVLightV2Bricklet(uid string) ([]Register, error) {
+	d, err := uv_light_v2_bricklet.New(uid, &b.Connection)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect Ultra Violet Light V2.0 (uid=%s): %s", uid, err)
+	}
+
+	uvID := d.RegisterUVACallback(func(uva int32) {
+		b.Values <- Value{
+			Index:    0,
+			DeviceID: uv_light_v2_bricklet.DeviceIdentifier,
+			UID:      uid,
+			Help:     "UV in mW/m²",
+			Name:     "uv",
+			Type:     prometheus.GaugeValue,
+			Value:    float64(uva) / 10,
+		}
+	})
+	d.SetUVACallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	return []Register{
+		{
+			Deregister: d.DeregisterUVACallback,
+			ID:         uvID,
 		},
 	}, nil
 }

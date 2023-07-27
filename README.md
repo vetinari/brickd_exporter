@@ -101,13 +101,16 @@ Bricks:
 
 Bricklets:
 
+* [Ambient Light Bricklet 3.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Ambient_Light_V3.html)
 * [Analog In V3 Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Analog_In_V3.html)
 * [AirQuality Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Air_Quality.html)
 * [Barometer Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Barometer.html)
 * [Barometer Bricklet v2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Barometer_V2.html)
+* [CO2 Bricklet 2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/CO2_V2.html)
 * [Humidity Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Humidity.html)
 * [Humidity Bricklet v2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Humidity_V2.html)
 * [Outdoor Weather Bricklet](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/Outdoor_Weather.html)
+* [UV Light Bricklet v2.0](https://www.tinkerforge.com/en/doc/Hardware/Bricklets/UV_Light_V2.html)
 
 Adding more is easy, see [Contributing](#contributing)
 
