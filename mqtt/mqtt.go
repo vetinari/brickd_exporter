@@ -9,10 +9,16 @@ import (
 )
 
 type MQTT struct {
-	Enabled bool    `yaml:"enabled"`
-	Broker  *Broker `yaml:"broker"`
-	Topic   Topic   `yaml:"topic"`
-	Client  *Client `yaml:"-"`
+	Enabled       bool          `yaml:"enabled"`
+	Broker        *Broker       `yaml:"broker"`
+	Topic         Topic         `yaml:"topic"`
+	Client        *Client       `yaml:"-"`
+	HomeAssistant HomeAssistant `yaml:"homeassistant"`
+}
+
+type HomeAssistant struct {
+	Enabled       bool   `yaml:"enabled"`
+	DiscoveryBase string `yaml:"discovery_base"`
 }
 
 type Topic string

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -102,4 +103,15 @@ func (b *BrickdCollector) exportMQTTOnce() {
 		}
 		go b.MQTT.Client.Publish(b.MQTT.Topic.Name(dev.Topic), enc)
 	}
+}
+
+func (b *BrickdCollector) SensorTopic(dev *Device) string {
+	if sl, ok := b.SensorLabels[v.UID]; ok {
+		if l, ok := sl[strconv.Itoa(v.SensorID)]; ok {
+			if t, ok := l["mqtt_topic"]; ok {
+				return t
+			}
+		}
+	}
+	return strings.Replace(dev.Name, " ", "")
 }
