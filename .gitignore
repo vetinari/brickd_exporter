@@ -1,2 +1,3 @@
 brickd_exporter
 brickd-local.yml
+/.cache/*

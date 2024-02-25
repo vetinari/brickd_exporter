@@ -24,6 +24,9 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/co2_v2_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/uv_light_v2_bricklet"
 )
 
 const (
@@ -125,6 +128,9 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		barometer_v2_bricklet.DeviceIdentifier: brickd.RegisterBarometerBricklet,
 		humidity_bricklet.DeviceIdentifier:     brickd.RegisterHumidityBricklet,
 		humidity_v2_bricklet.DeviceIdentifier:  brickd.RegisterHumidityV2Bricklet,
+		ambient_light_v3_bricklet.DeviceIdentifier: brickd.RegisterAmbientLightV3Bricklet,
+		co2_v2_bricklet.DeviceIdentifier: brickd.RegisterCO2V2Bricklet,
+		uv_light_v2_bricklet.DeviceIdentifier: brickd.RegisterUVLightV2Bricklet,
 
 		outdoor_weather_bricklet.DeviceIdentifier: brickd.RegisterOutdoorWeatherBricklet,
 	}
