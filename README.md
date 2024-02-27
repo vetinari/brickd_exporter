@@ -87,6 +87,28 @@ not be in the labels (not in prometheus and not in the MQTT payload).
 The "Master Brick", "HAT Brick" and "HAT Zero Brick" values are reported in the topics `master_brick`, 
 `hat_brick` and `hat_zero_brick` topics respectively (prefixed by `mqtt.topic` of course).
 
+### Home Assistant
+
+With MQTT enabled, you can also enable the auto discovery options for
+[Home Assistant](https://www.home-assistant.io/). This is done by extending the `mqtt` settings like
+
+```yaml
+mqtt:
+  enabled: true
+  broker:
+    host: 192.168.5.33
+    port: 1883
+    username: brickd
+    password: brickd_pass
+    client_id: brickd_exporter
+  topic: brickd/
+  homeassistant:
+    enabled: true
+    discovery_topic: homeassistant/
+```
+
+After starting, the new devices - one per bricklet - and their entities should show up in your HA setup.
+
 ### Running
 
 Start with `--config.file /path/to/brickd.yml` to pass a config file. 

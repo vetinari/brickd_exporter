@@ -3,6 +3,7 @@ package collector
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -105,13 +106,19 @@ func (b *BrickdCollector) exportMQTTOnce() {
 	}
 }
 
-func (b *BrickdCollector) SensorTopic(dev *Device) string {
-	if sl, ok := b.SensorLabels[v.UID]; ok {
-		if l, ok := sl[strconv.Itoa(v.SensorID)]; ok {
+func (b *BrickdCollector) SensorTopic(dev *Device, index int) string {
+	if sl, ok := b.SensorLabels[dev.UID]; ok {
+		if l, ok := sl[strconv.Itoa(index)]; ok {
 			if t, ok := l["mqtt_topic"]; ok {
 				return t
 			}
 		}
 	}
-	return strings.Replace(dev.Name, " ", "")
+	return b.DefaultTopic(dev)
+}
+
+var cleanID = regexp.MustCompile(`[^a-z0-9_]`)
+
+func (b *BrickdCollector) DefaultTopic(dev *Device) string {
+	return cleanID.ReplaceAllString(strings.ToLower(DeviceName(dev.DeviceID)), "_") + "_" + dev.UID
 }

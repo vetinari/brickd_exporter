@@ -81,8 +81,8 @@ func defaultConfig() (*LocalConfig, error) {
 			Enabled: false,
 			Topic:   "brickd/",
 			HomeAssistant: mqtt.HomeAssistant{
-				Enabled:        false,
-				DiscoveryTopic: "homeassistant/",
+				Enabled:       false,
+				DiscoveryBase: "homeassistant/",
 			},
 		},
 	}, nil

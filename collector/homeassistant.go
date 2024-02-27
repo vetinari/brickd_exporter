@@ -1,42 +1,75 @@
 package collector
 
-import "strings"
+import (
+	"encoding/json"
+	"fmt"
 
-func (b *BrickdCollector) PublishHAConfig(dev *Device) {
-	if dev.UnitOfMeasurement == "" {
+	log "github.com/sirupsen/logrus"
+)
+
+func (b *BrickdCollector) SetHAConfig(typ, devClass, valueName, unit, uniqueID string, dev *Device, idx int) {
+	if b.MQTT == nil || !b.MQTT.Enabled || !b.MQTT.HomeAssistant.Enabled {
 		return
 	}
-	topic = b.MQTT.HomeAssistant.DiscoveryTopic
+	topic := b.MQTT.HomeAssistant.DiscoveryBase
 	if topic == "" {
 		topic = "homeassistant/"
 	}
-	if !strings.HasSuffix(baseTopic, "/") {
-		topic += "/"
-	}
-	topic += "sensor/brickd_" + dev.UID + "/config"
+	topic += typ + "/brickd_" + uniqueID + "_" + valueName + "/config"
+	id := b.DefaultTopic(dev)
 
 	cfg := &HAConfig{
-		UniqueID:          "brickd_" + dev.UID,
-		StateTopic:        "brickd/" + b.SensorTopic(dev.UID),
-		UnitOfMeasurement: dev.UnitOfMeasurement,
+		DeviceClass:       devClass,
+		UniqueID:          "brickd_" + uniqueID + "_" + valueName,
+		ObjectID:          "brickd_" + uniqueID + "_" + valueName,
+		Name:              "brickd_" + uniqueID + "_" + valueName,
+		StateTopic:        "brickd/" + b.SensorTopic(dev, idx),
+		UnitOfMeasurement: unit,
+		ValueTemplate:     fmt.Sprintf("{{ value_json.%s }}", valueName),
+		Device: HADevice{
+			Name:         "Brickd: " + b.Address + " / " + DeviceName(dev.DeviceID),
+			Identifiers:  []string{id},
+			HWVersion:    dev.HardwareVersion,
+			SWVersion:    dev.FirmwareVersion,
+			Manufacturer: "Tinkerforge GmbH",
+			Model:        DeviceName(dev.DeviceID),
+		},
+		Origin: HAOrigin{
+			Name:       "brickd",
+			SWVersion:  Version,
+			SupportURL: "https://github.com/vetinari/brickd_exporter",
+		},
 	}
-	switch dev.DeviceID {
-	case 288: // Outdoor Weather Bricklet
+	enc, err := json.Marshal(cfg)
+	if err != nil {
+		log.Errorf("failed to marshal HA Config: %s", err)
+		return
 	}
+	log.Infof("publishing HA config to %s: %s", topic, string(enc))
+	go b.MQTT.Client.Publish(topic, enc)
 }
 
 type HAConfig struct {
+	Name              string   `json:"name"`
 	DeviceClass       string   `json:"device_class"`
 	StateTopic        string   `json:"state_topic"`
 	UnitOfMeasurement string   `json:"unit_of_measurement"`
 	ValueTemplate     string   `json:"value_template"`
 	UniqueID          string   `json:"unique_id"`
+	ObjectID          string   `json:"object_id"`
 	Device            HADevice `json:"device"`
+	Origin            HAOrigin `json:"origin"`
+}
+
+type HAOrigin struct {
+	Name       string `json:"name"`
+	SWVersion  string `json:"sw_version"`
+	SupportURL string `json:"support_url"`
 }
 
 type HADevice struct {
 	Identifiers      []string `json:"identifiers"`
-	Name             string   `json:"name"`
+	Name             string   `json:"name,omitempty"`
 	Manufacturer     string   `json:"manufacturer"`
 	Model            string   `json:"model"`
 	SerialNumber     string   `json:"serial_number,omitempty"`

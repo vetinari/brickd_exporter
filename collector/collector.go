@@ -19,19 +19,21 @@ import (
 	"github.com/Tinkerforge/go-api-bindings/master_brick"
 
 	// bricklets:
+	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/co2_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
-	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
-	"github.com/Tinkerforge/go-api-bindings/co2_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/uv_light_v2_bricklet"
 )
 
 const (
 	EthernetCallbackID uint64 = math.MaxUint64
 )
+
+var Version string
 
 // BrickdCollector does all the work
 type BrickdCollector struct {
@@ -54,7 +56,7 @@ type BrickdCollector struct {
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks
-type RegisterFunc func(string) ([]Register, error)
+type RegisterFunc func(*Device) ([]Register, error)
 
 // BrickData are discovered devices and their values
 type BrickData struct {
@@ -115,27 +117,6 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 		ExpirePeriod:   expirePeriod,
 		MQTT:           mq,
 	}
-	brickd.Devices = map[uint16]RegisterFunc{
-		// Bricks
-		master_brick.DeviceIdentifier:   brickd.RegisterMasterBrick,
-		hat_zero_brick.DeviceIdentifier: brickd.RegisterZeroHatBrick,
-		hat_brick.DeviceIdentifier:      brickd.RegisterHatBrick,
-
-		// Bricklets
-		analog_in_v3_bricklet.DeviceIdentifier: brickd.RegisterAnalogInV3Bricklet,
-		air_quality_bricklet.DeviceIdentifier:  brickd.RegisterAirQualityBricklet,
-		barometer_bricklet.DeviceIdentifier:    brickd.RegisterBarometerBricklet,
-		barometer_v2_bricklet.DeviceIdentifier: brickd.RegisterBarometerV2Bricklet,
-		humidity_bricklet.DeviceIdentifier:     brickd.RegisterHumidityBricklet,
-		humidity_v2_bricklet.DeviceIdentifier:  brickd.RegisterHumidityV2Bricklet,
-		ambient_light_v3_bricklet.DeviceIdentifier: brickd.RegisterAmbientLightV3Bricklet,
-		co2_v2_bricklet.DeviceIdentifier: brickd.RegisterCO2V2Bricklet,
-		uv_light_v2_bricklet.DeviceIdentifier: brickd.RegisterUVLightV2Bricklet,
-
-		outdoor_weather_bricklet.DeviceIdentifier: brickd.RegisterOutdoorWeatherBricklet,
-	}
-
-	go brickd.Update()
 
 	if brickd.MQTT.Enabled {
 		var err error
@@ -146,6 +127,28 @@ func NewCollector(addr, password string, cbPeriod time.Duration, ignoredUIDs []s
 			go brickd.ExportMQTT(cbPeriod)
 		}
 	}
+
+	brickd.Devices = map[uint16]RegisterFunc{
+		// Bricks
+		master_brick.DeviceIdentifier:   brickd.RegisterMasterBrick,
+		hat_zero_brick.DeviceIdentifier: brickd.RegisterZeroHatBrick,
+		hat_brick.DeviceIdentifier:      brickd.RegisterHatBrick,
+
+		// Bricklets
+		analog_in_v3_bricklet.DeviceIdentifier:     brickd.RegisterAnalogInV3Bricklet,
+		air_quality_bricklet.DeviceIdentifier:      brickd.RegisterAirQualityBricklet,
+		barometer_bricklet.DeviceIdentifier:        brickd.RegisterBarometerBricklet,
+		barometer_v2_bricklet.DeviceIdentifier:     brickd.RegisterBarometerV2Bricklet,
+		humidity_bricklet.DeviceIdentifier:         brickd.RegisterHumidityBricklet,
+		humidity_v2_bricklet.DeviceIdentifier:      brickd.RegisterHumidityV2Bricklet,
+		ambient_light_v3_bricklet.DeviceIdentifier: brickd.RegisterAmbientLightV3Bricklet,
+		co2_v2_bricklet.DeviceIdentifier:           brickd.RegisterCO2V2Bricklet,
+		uv_light_v2_bricklet.DeviceIdentifier:      brickd.RegisterUVLightV2Bricklet,
+
+		outdoor_weather_bricklet.DeviceIdentifier: brickd.RegisterOutdoorWeatherBricklet,
+	}
+
+	go brickd.Update()
 	return brickd
 }
 

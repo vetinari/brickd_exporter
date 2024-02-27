@@ -106,7 +106,7 @@ func (b *BrickdCollector) OnEnumerate(
 		return
 	}
 
-	reg, err := regFunc(dev.UID)
+	reg, err := regFunc(dev)
 	if err != nil {
 		log.Warnf("failed to register device %s (uid=%s): %s", DeviceName(dev.DeviceID), dev.UID, err)
 		return
@@ -119,8 +119,5 @@ func (b *BrickdCollector) OnEnumerate(
 	b.Registry[dev.UID] = reg
 	for _, reg := range b.Registry[dev.UID] {
 		log.Debugf("callback registered for %s (uid=%s): %d", DeviceName(dev.DeviceID), dev.UID, reg.ID)
-		if b.MQTT != nil && b.MQTT.Enabled && b.MQTT.HomeAssistant.Enabled {
-			b.PublishHAConfig(dev)
-		}
 	}
 }
