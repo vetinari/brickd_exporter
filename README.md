@@ -104,7 +104,7 @@ mqtt:
   topic: brickd/
   homeassistant:
     enabled: true
-    discovery_topic: homeassistant/
+    discovery_base: homeassistant/
 ```
 
 After starting, the new devices - one per bricklet - and their entities should show up in your HA setup.

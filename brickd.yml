@@ -35,4 +35,6 @@ mqtt:
     password: brickd_pass
     client_id: brickd_exporter
   topic: brickd/
-
+  homeassistant:
+    enabled: false
+    discovery_base: homeassistant/
