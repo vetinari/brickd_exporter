@@ -31,14 +31,18 @@ func (b *BrickdCollector) SetHAConfig(typ, devClass, valueName, unit, uniqueID s
 		id += "_" + deviceID
 	}
 
+	valueTemplate := fmt.Sprintf("{{ value_json.%s }}", valueName)
+	if typ == "binary_sensor" {
+		valueTemplate = fmt.Sprintf("{%% if value_json.%s == 0 %%}OFF{%% else %%}ON{%% endif %%}", valueName)
+	}
 	cfg := &HAConfig{
 		DeviceClass:       devClass,
 		UniqueID:          "brickd_" + uniqueID + "_" + valueName,
 		ObjectID:          "brickd_" + uniqueID + "_" + valueName,
 		Name:              "brickd_" + uniqueID + "_" + valueName,
-		StateTopic:        "brickd/" + b.SensorTopic(dev, idx),
+		StateTopic:        string(b.MQTT.Topic) + b.SensorTopic(dev, idx),
 		UnitOfMeasurement: unit,
-		ValueTemplate:     fmt.Sprintf("{{ value_json.%s }}", valueName),
+		ValueTemplate:     valueTemplate,
 		Device: HADevice{
 			Name:         "Brickd: " + b.Address + " / " + DeviceName(dev.DeviceID),
 			Identifiers:  []string{id},
