@@ -2,6 +2,7 @@ package collector
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/Tinkerforge/go-api-bindings/outdoor_weather_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
@@ -55,8 +56,9 @@ func (b *BrickdCollector) RegisterOutdoorWeatherBricklet(dev *Device) ([]Registe
 			ID:         cbID,
 		})
 		idx := int(sid) << 8
-		b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
+		uniqueID := fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx)
+		b.SetHAConfig("sensor", "temperature", "temperature", "°C", uniqueID, dev, idx, strconv.Itoa(idx))
+		b.SetHAConfig("sensor", "humidity", "humidity", "%", uniqueID, dev, idx, strconv.Itoa(idx))
 	}
 
 	d.SetStationCallbackConfiguration(true)
@@ -139,12 +141,14 @@ func (b *BrickdCollector) RegisterOutdoorWeatherBricklet(dev *Device) ([]Registe
 			ID:         cbID,
 		})
 		idx := int(stid)<<8 + 65536
-		b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("sensor", "wind_speed", "wind_speed", "m/s", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("sensor", "wind_speed", "gust_speed", "m/s", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("sensor", "precipitation", "rain", "mm", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("binary_sensor", "battery", "battery_low", "", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
+		uniqueID := fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx)
+
+		b.SetHAConfig("sensor", "temperature", "temperature", "°C", uniqueID, dev, idx, strconv.Itoa(idx))
+		b.SetHAConfig("sensor", "humidity", "humidity", "%", uniqueID, dev, idx, strconv.Itoa(idx))
+		b.SetHAConfig("sensor", "wind_speed", "wind_speed", "m/s", uniqueID, dev, idx, strconv.Itoa(idx))
+		b.SetHAConfig("sensor", "wind_speed", "gust_speed", "m/s", uniqueID, dev, idx, strconv.Itoa(idx))
+		b.SetHAConfig("sensor", "precipitation", "rain", "mm", uniqueID, dev, idx, strconv.Itoa(idx))
+		b.SetHAConfig("binary_sensor", "battery", "battery_low", "", uniqueID, dev, idx, strconv.Itoa(idx))
 	}
 	return reg, nil
 }

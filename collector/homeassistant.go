@@ -7,7 +7,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (b *BrickdCollector) SetHAConfig(typ, devClass, valueName, unit, uniqueID string, dev *Device, idx int) {
+// SetHAConfig writes the HomeAssistant config to MQTT
+// Parameters:
+// * typ - HA type, probably either "sensor" or "binary_sensor"
+// * devClass - type of sensor, must be a valid HA device class
+// * valueName - name of the value inside the JSON of the MQTT topic we're publishing to
+// * unit - HA unit
+// * uniqueID - make these sensors unique
+// * dev - the *Device
+// * idx - unless there can be multiple sensors (like in the Outdoor Weather Bricklet) this is 0
+// * deviceID - make a new "device" when not empty, just used in the Outdoor Weather Bricklet, otherwise ""
+func (b *BrickdCollector) SetHAConfig(typ, devClass, valueName, unit, uniqueID string, dev *Device, idx int, deviceID string) {
 	if b.MQTT == nil || !b.MQTT.Enabled || !b.MQTT.HomeAssistant.Enabled {
 		return
 	}
@@ -17,6 +27,9 @@ func (b *BrickdCollector) SetHAConfig(typ, devClass, valueName, unit, uniqueID s
 	}
 	topic += typ + "/brickd_" + uniqueID + "_" + valueName + "/config"
 	id := b.DefaultTopic(dev)
+	if deviceID != "" {
+		id += "_" + deviceID
+	}
 
 	cfg := &HAConfig{
 		DeviceClass:       devClass,

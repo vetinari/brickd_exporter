@@ -74,10 +74,10 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(dev *Device) ([]Register, e
 		return nil, fmt.Errorf("failed to set callback config for Air Quality Bricklet (uid=%s): %s", uid, err)
 	}
 
-	b.SetHAConfig("sensor", "aqi", "iaq_index", "", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "atmospheric_pressure", "pressure", "hPa", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "aqi", "iaq_index", "", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "atmospheric_pressure", "pressure", "hPa", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
 
 	return []Register{
 		{
@@ -111,7 +111,7 @@ func (b *BrickdCollector) RegisterAnalogInV3Bricklet(dev *Device) ([]Register, e
 	// Threshold is turned off and min/max zero to always collect metrics in fixed period
 	d.SetVoltageCallbackConfiguration(b.CallbackPeriod, false, 'x', 0, 0)
 
-	b.SetHAConfig("sensor", "voltage", "voltage", "V", fmt.Sprintf("analog_in_v3_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "voltage", "voltage", "V", fmt.Sprintf("analog_in_v3_bricklet_%s", uid), dev, 0, "")
 
 	return []Register{
 		{
@@ -142,7 +142,7 @@ func (b *BrickdCollector) RegisterHumidityBricklet(dev *Device) ([]Register, err
 	})
 	d.SetHumidityCallbackPeriod(b.CallbackPeriod)
 
-	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_%s", uid), dev, 0, "")
 
 	return []Register{
 		{
@@ -185,8 +185,8 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(dev *Device) ([]Register, e
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
-	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0, "")
 	return []Register{
 		{
 			Deregister: d.DeregisterHumidityCallback,
@@ -232,8 +232,8 @@ func (b *BrickdCollector) RegisterBarometerBricklet(dev *Device) ([]Register, er
 	})
 	d.SetAltitudeCallbackPeriod(b.CallbackPeriod)
 
-	b.SetHAConfig("sensor", "atmospheric_pressure", "air_pressure", "hPa", fmt.Sprintf("barometer_bricklet_%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "distance", "altitude", "m", fmt.Sprintf("barometer_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "atmospheric_pressure", "air_pressure", "hPa", fmt.Sprintf("barometer_bricklet_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "distance", "altitude", "m", fmt.Sprintf("barometer_bricklet_%s", uid), dev, 0, "")
 	return []Register{
 		{
 			Deregister: d.DeregisterAirPressureCallback,
@@ -292,9 +292,9 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(dev *Device) ([]Register, 
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
-	b.SetHAConfig("sensor", "atmospheric_pressure", "air_pressure", "hPa", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "distance", "altitude", "m", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "temperature", "bricklet_temperature", "°C", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "atmospheric_pressure", "air_pressure", "hPa", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "distance", "altitude", "m", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "bricklet_temperature", "°C", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
 
 	return []Register{
 		{
@@ -332,7 +332,7 @@ func (b *BrickdCollector) RegisterAmbientLightV3Bricklet(dev *Device) ([]Registe
 	})
 	d.SetIlluminanceCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
-	b.SetHAConfig("sensor", "illuminance", "illuminance", "lx", fmt.Sprintf("ambient_light_v3_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "illuminance", "illuminance", "lx", fmt.Sprintf("ambient_light_v3_bricklet_%s", uid), dev, 0, "")
 	return []Register{
 		{
 			Deregister: d.DeregisterIlluminanceCallback,
@@ -387,9 +387,9 @@ func (b *BrickdCollector) RegisterCO2V2Bricklet(dev *Device) ([]Register, error)
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
-	b.SetHAConfig("sensor", "carbon_dioxide", "co2_concentration", "ppm", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "carbon_dioxide", "co2_concentration", "ppm", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
 
 	return []Register{
 		{
@@ -427,7 +427,7 @@ func (b *BrickdCollector) RegisterUVLightV2Bricklet(dev *Device) ([]Register, er
 	})
 	d.SetUVACallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
-	b.SetHAConfig("sensor", "", "uv", "mW/m²", fmt.Sprintf("uv_light_v2_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "", "uv", "mW/m²", fmt.Sprintf("uv_light_v2_bricklet_%s", uid), dev, 0, "")
 
 	return []Register{
 		{
