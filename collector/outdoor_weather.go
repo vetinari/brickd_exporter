@@ -56,7 +56,7 @@ func (b *BrickdCollector) RegisterOutdoorWeatherBricklet(dev *Device) ([]Registe
 		})
 		idx := int(sid) << 8
 		b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("sensor", "humidity", "humidity", "%rH", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
+		b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
 	}
 
 	d.SetStationCallbackConfiguration(true)
@@ -140,7 +140,7 @@ func (b *BrickdCollector) RegisterOutdoorWeatherBricklet(dev *Device) ([]Registe
 		})
 		idx := int(stid)<<8 + 65536
 		b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
-		b.SetHAConfig("sensor", "humidity", "humidity", "%rH", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
+		b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
 		b.SetHAConfig("sensor", "wind_speed", "wind_speed", "m/s", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
 		b.SetHAConfig("sensor", "wind_speed", "gust_speed", "m/s", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)
 		b.SetHAConfig("sensor", "precipitation", "rain", "mm", fmt.Sprintf("outdoor_weather_bricklet_%s_%d", uid, idx), dev, idx)

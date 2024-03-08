@@ -77,7 +77,7 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(dev *Device) ([]Register, e
 	b.SetHAConfig("sensor", "aqi", "iaq_index", "", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
 	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
 	b.SetHAConfig("sensor", "atmospheric_pressure", "pressure", "hPa", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "humidity", "humidity", "%rH", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0)
 
 	return []Register{
 		{
@@ -142,7 +142,7 @@ func (b *BrickdCollector) RegisterHumidityBricklet(dev *Device) ([]Register, err
 	})
 	d.SetHumidityCallbackPeriod(b.CallbackPeriod)
 
-	b.SetHAConfig("sensor", "humidity", "humidity", "%rH", fmt.Sprintf("humidity_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_%s", uid), dev, 0)
 
 	return []Register{
 		{
@@ -185,7 +185,7 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(dev *Device) ([]Register, e
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
-	b.SetHAConfig("sensor", "humidity", "humidity", "%rH", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0)
 	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0)
 	return []Register{
 		{
@@ -388,7 +388,7 @@ func (b *BrickdCollector) RegisterCO2V2Bricklet(dev *Device) ([]Register, error)
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
 	b.SetHAConfig("sensor", "carbon_dioxide", "co2_concentration", "ppm", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0)
-	b.SetHAConfig("sensor", "humidity", "humidity", "%rH", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0)
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0)
 	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0)
 
 	return []Register{
