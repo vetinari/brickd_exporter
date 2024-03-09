@@ -4,18 +4,19 @@ import (
 	"fmt"
 
 	"github.com/Tinkerforge/go-api-bindings/air_quality_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/analog_in_v3_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/barometer_v2_bricklet"
+	"github.com/Tinkerforge/go-api-bindings/co2_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/humidity_v2_bricklet"
-	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
-	"github.com/Tinkerforge/go-api-bindings/co2_v2_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/uv_light_v2_bricklet"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func (b *BrickdCollector) RegisterAirQualityBricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterAirQualityBricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := air_quality_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Air Quality Bricklet (uid=%s): %s", uid, err)
@@ -72,6 +73,12 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(uid string) ([]Register, er
 	if err := d.SetAllValuesCallbackConfiguration(b.CallbackPeriod, false); err != nil {
 		return nil, fmt.Errorf("failed to set callback config for Air Quality Bricklet (uid=%s): %s", uid, err)
 	}
+
+	b.SetHAConfig("sensor", "aqi", "iaq_index", "", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "atmospheric_pressure", "pressure", "hPa", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
+
 	return []Register{
 		{
 			Deregister: d.DeregisterAllValuesCallback,
@@ -80,7 +87,8 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(uid string) ([]Register, er
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterAnalogInV3Bricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterAnalogInV3Bricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := analog_in_v3_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect AnalogInV3 Bricklet (uid=%s): %s", uid, err)
@@ -91,7 +99,7 @@ func (b *BrickdCollector) RegisterAnalogInV3Bricklet(uid string) ([]Register, er
 			Index:    0,
 			DeviceID: analog_in_v3_bricklet.DeviceIdentifier,
 			UID:      uid,
-			Help:     "Voltage in %rV",
+			Help:     "Voltage in V",
 			Name:     "voltage",
 			Type:     prometheus.GaugeValue,
 			Value:    float64(voltage) / 1000.0,
@@ -103,6 +111,8 @@ func (b *BrickdCollector) RegisterAnalogInV3Bricklet(uid string) ([]Register, er
 	// Threshold is turned off and min/max zero to always collect metrics in fixed period
 	d.SetVoltageCallbackConfiguration(b.CallbackPeriod, false, 'x', 0, 0)
 
+	b.SetHAConfig("sensor", "voltage", "voltage", "V", fmt.Sprintf("analog_in_v3_bricklet_%s", uid), dev, 0, "")
+
 	return []Register{
 		{
 			Deregister: d.DeregisterVoltageCallback,
@@ -112,7 +122,8 @@ func (b *BrickdCollector) RegisterAnalogInV3Bricklet(uid string) ([]Register, er
 
 }
 
-func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterHumidityBricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := humidity_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Humidity Bricklet (uid=%s): %s", uid, err)
@@ -130,6 +141,9 @@ func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, erro
 		}
 	})
 	d.SetHumidityCallbackPeriod(b.CallbackPeriod)
+
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_%s", uid), dev, 0, "")
+
 	return []Register{
 		{
 			Deregister: d.DeregisterHumidityCallback,
@@ -138,7 +152,8 @@ func (b *BrickdCollector) RegisterHumidityBricklet(uid string) ([]Register, erro
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterHumidityV2Bricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := humidity_v2_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Humidity Bricklet V2.0 (uid=%s): %s", uid, err)
@@ -170,6 +185,8 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) ([]Register, er
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0, "")
 	return []Register{
 		{
 			Deregister: d.DeregisterHumidityCallback,
@@ -182,7 +199,8 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(uid string) ([]Register, er
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterBarometerBricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterBarometerBricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := barometer_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Barometer Bricklet (uid=%s): %s", uid, err)
@@ -214,6 +232,8 @@ func (b *BrickdCollector) RegisterBarometerBricklet(uid string) ([]Register, err
 	})
 	d.SetAltitudeCallbackPeriod(b.CallbackPeriod)
 
+	b.SetHAConfig("sensor", "atmospheric_pressure", "air_pressure", "hPa", fmt.Sprintf("barometer_bricklet_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "distance", "altitude", "m", fmt.Sprintf("barometer_bricklet_%s", uid), dev, 0, "")
 	return []Register{
 		{
 			Deregister: d.DeregisterAirPressureCallback,
@@ -226,7 +246,8 @@ func (b *BrickdCollector) RegisterBarometerBricklet(uid string) ([]Register, err
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterBarometerV2Bricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := barometer_v2_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Barometer Bricklet V2.0 (uid=%s): %s", uid, err)
@@ -271,6 +292,10 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
+	b.SetHAConfig("sensor", "atmospheric_pressure", "air_pressure", "hPa", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "distance", "altitude", "m", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "bricklet_temperature", "°C", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
+
 	return []Register{
 		{
 			Deregister: d.DeregisterAirPressureCallback,
@@ -287,7 +312,8 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(uid string) ([]Register, e
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterAmbientLightV3Bricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterAmbientLightV3Bricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := ambient_light_v3_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Ambient Light V3.0 (uid=%s): %s", uid, err)
@@ -306,6 +332,7 @@ func (b *BrickdCollector) RegisterAmbientLightV3Bricklet(uid string) ([]Register
 	})
 	d.SetIlluminanceCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
+	b.SetHAConfig("sensor", "illuminance", "illuminance", "lx", fmt.Sprintf("ambient_light_v3_bricklet_%s", uid), dev, 0, "")
 	return []Register{
 		{
 			Deregister: d.DeregisterIlluminanceCallback,
@@ -314,7 +341,8 @@ func (b *BrickdCollector) RegisterAmbientLightV3Bricklet(uid string) ([]Register
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterCO2V2Bricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterCO2V2Bricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := co2_v2_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Barometer Bricklet V2.0 (uid=%s): %s", uid, err)
@@ -359,6 +387,10 @@ func (b *BrickdCollector) RegisterCO2V2Bricklet(uid string) ([]Register, error) 
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
+	b.SetHAConfig("sensor", "carbon_dioxide", "co2_concentration", "ppm", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
+	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
+
 	return []Register{
 		{
 			Deregister: d.DeregisterCO2ConcentrationCallback,
@@ -375,7 +407,8 @@ func (b *BrickdCollector) RegisterCO2V2Bricklet(uid string) ([]Register, error) 
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterUVLightV2Bricklet(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterUVLightV2Bricklet(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	d, err := uv_light_v2_bricklet.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Ultra Violet Light V2.0 (uid=%s): %s", uid, err)
@@ -393,6 +426,8 @@ func (b *BrickdCollector) RegisterUVLightV2Bricklet(uid string) ([]Register, err
 		}
 	})
 	d.SetUVACallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	b.SetHAConfig("sensor", "", "uv", "mW/m²", fmt.Sprintf("uv_light_v2_bricklet_%s", uid), dev, 0, "")
 
 	return []Register{
 		{

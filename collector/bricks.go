@@ -12,7 +12,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (b *BrickdCollector) RegisterMasterBrick(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterMasterBrick(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	m, err := master_brick.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Master Brick (uid=%s): %s", uid, err)
@@ -134,7 +135,8 @@ func (b *BrickdCollector) PollEthernetState(m master_brick.MasterBrick, uid stri
 	}()
 }
 
-func (b *BrickdCollector) RegisterZeroHatBrick(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterZeroHatBrick(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	h, err := hat_zero_brick.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Zero Hat Brick (uid=%s): %s", uid, err)
@@ -161,7 +163,8 @@ func (b *BrickdCollector) RegisterZeroHatBrick(uid string) ([]Register, error) {
 	}, nil
 }
 
-func (b *BrickdCollector) RegisterHatBrick(uid string) ([]Register, error) {
+func (b *BrickdCollector) RegisterHatBrick(dev *Device) ([]Register, error) {
+	uid := dev.UID
 	h, err := hat_brick.New(uid, &b.Connection)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect Hat Brick (uid=%s): %s", uid, err)

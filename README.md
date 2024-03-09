@@ -15,14 +15,20 @@ will be removed in the future.
 
 ### Pre-requisite
 
-go version 1.19 or later (go modules are used in this repo).
+go version 1.21 or later.
 
 ### Building the brickd exporter
 
 Clone the repository via `go get github.com/vetinari/brickd_exporter` or git and cd into the directory.
 Then build the brickd\_exporter binary with the following commands.
 
-    $ go build
+    $ make build
+
+or to build for a raspberry pi:
+
+    $ make build.raspi
+
+The resulting binary will be in the `./build/` directory
 
 ### Configuration
 
@@ -42,6 +48,9 @@ brickd:
 mqtt:
     enabled: false
     topic: "brickd/"
+    homeassistant:
+       enabled: false
+       discovery_base: homeassistant/
 ```
 
 Any of these values can be set. Use the default `brickd.address` when the bricks are connected
@@ -86,6 +95,28 @@ not be in the labels (not in prometheus and not in the MQTT payload).
 
 The "Master Brick", "HAT Brick" and "HAT Zero Brick" values are reported in the topics `master_brick`, 
 `hat_brick` and `hat_zero_brick` topics respectively (prefixed by `mqtt.topic` of course).
+
+### Home Assistant
+
+With MQTT enabled, you can also enable the auto discovery options for
+[Home Assistant](https://www.home-assistant.io/). This is done by extending the `mqtt` settings like
+
+```yaml
+mqtt:
+  enabled: true
+  broker:
+    host: 192.168.5.33
+    port: 1883
+    username: brickd
+    password: brickd_pass
+    client_id: brickd_exporter
+  topic: brickd/
+  homeassistant:
+    enabled: true
+    discovery_base: homeassistant/
+```
+
+After starting, the new devices - one per bricklet - and their entities should show up in your HA setup.
 
 ### Running
 

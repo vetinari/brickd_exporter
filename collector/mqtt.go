@@ -3,7 +3,9 @@ package collector
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -102,4 +104,21 @@ func (b *BrickdCollector) exportMQTTOnce() {
 		}
 		go b.MQTT.Client.Publish(b.MQTT.Topic.Name(dev.Topic), enc)
 	}
+}
+
+func (b *BrickdCollector) SensorTopic(dev *Device, index int) string {
+	if sl, ok := b.SensorLabels[dev.UID]; ok {
+		if l, ok := sl[strconv.Itoa(index)]; ok {
+			if t, ok := l["mqtt_topic"]; ok {
+				return t
+			}
+		}
+	}
+	return b.DefaultTopic(dev)
+}
+
+var cleanID = regexp.MustCompile(`[^a-z0-9_]`)
+
+func (b *BrickdCollector) DefaultTopic(dev *Device) string {
+	return cleanID.ReplaceAllString(strings.ToLower(DeviceName(dev.DeviceID)), "_") + "_" + dev.UID
 }

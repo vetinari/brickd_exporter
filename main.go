@@ -12,6 +12,7 @@ import (
 
 func main() {
 	config, err := parseConfig()
+	collector.Version = Version
 	if err != nil {
 		log.Fatalf("Error loading configuration: %s", err)
 	}

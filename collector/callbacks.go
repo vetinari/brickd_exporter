@@ -106,7 +106,7 @@ func (b *BrickdCollector) OnEnumerate(
 		return
 	}
 
-	reg, err := regFunc(dev.UID)
+	reg, err := regFunc(dev)
 	if err != nil {
 		log.Warnf("failed to register device %s (uid=%s): %s", DeviceName(dev.DeviceID), dev.UID, err)
 		return
