@@ -1,6 +1,6 @@
 module github.com/vetinari/brickd_exporter
 
-go 1.19
+go 1.21
 
 require (
 	github.com/Tinkerforge/go-api-bindings v0.0.0-20240227173217-368b7493d93e
@@ -17,10 +17,10 @@ require (
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/prometheus/client_model v0.6.0 // indirect
-	github.com/prometheus/common v0.48.0 // indirect
-	github.com/prometheus/procfs v0.12.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
+	github.com/prometheus/common v0.50.0 // indirect
+	github.com/prometheus/procfs v0.13.0 // indirect
+	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
-	google.golang.org/protobuf v1.32.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 )

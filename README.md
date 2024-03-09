@@ -15,14 +15,20 @@ will be removed in the future.
 
 ### Pre-requisite
 
-go version 1.19 or later (go modules are used in this repo).
+go version 1.21 or later.
 
 ### Building the brickd exporter
 
 Clone the repository via `go get github.com/vetinari/brickd_exporter` or git and cd into the directory.
 Then build the brickd\_exporter binary with the following commands.
 
-    $ go build
+    $ make build
+
+or to build for a raspberry pi:
+
+    $ make build.raspi
+
+The resulting binary will be in the `./build/` directory
 
 ### Configuration
 
@@ -42,6 +48,9 @@ brickd:
 mqtt:
     enabled: false
     topic: "brickd/"
+    homeassistant:
+       enabled: false
+       discovery_base: homeassistant/
 ```
 
 Any of these values can be set. Use the default `brickd.address` when the bricks are connected
