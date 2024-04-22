@@ -51,6 +51,7 @@ mqtt:
     homeassistant:
        enabled: false
        discovery_base: homeassistant/
+       interval: 5m
 ```
 
 Any of these values can be set. Use the default `brickd.address` when the bricks are connected
@@ -114,6 +115,7 @@ mqtt:
   homeassistant:
     enabled: true
     discovery_base: homeassistant/
+    interval: 5m
 ```
 
 After starting, the new devices - one per bricklet - and their entities should show up in your HA setup.
