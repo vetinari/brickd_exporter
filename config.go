@@ -83,6 +83,7 @@ func defaultConfig() (*LocalConfig, error) {
 			HomeAssistant: mqtt.HomeAssistant{
 				Enabled:       false,
 				DiscoveryBase: "homeassistant/",
+				Interval:      5 * time.Minute,
 			},
 		},
 	}, nil

@@ -3,6 +3,7 @@ package mqtt
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	log "github.com/sirupsen/logrus"
@@ -17,8 +18,9 @@ type MQTT struct {
 }
 
 type HomeAssistant struct {
-	Enabled       bool   `yaml:"enabled"`
-	DiscoveryBase string `yaml:"discovery_base"`
+	Enabled       bool          `yaml:"enabled"`
+	DiscoveryBase string        `yaml:"discovery_base"`
+	Interval      time.Duration `yaml:"interval"`
 }
 
 type Topic string

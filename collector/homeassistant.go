@@ -3,6 +3,7 @@ package collector
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -21,6 +22,20 @@ func (b *BrickdCollector) SetHAConfig(typ, devClass, valueName, unit, uniqueID s
 	if b.MQTT == nil || !b.MQTT.Enabled || !b.MQTT.HomeAssistant.Enabled {
 		return
 	}
+	b.setHAConfig(typ, devClass, valueName, unit, uniqueID, dev, idx, deviceID)
+	if b.MQTT.HomeAssistant.Interval == 0 {
+		return
+	}
+
+	go func(typ, devClass, valueName, unit, uniqueID string, dev *Device, idx int, deviceID string) {
+		time.Sleep(b.MQTT.HomeAssistant.Interval)
+		for _ = range time.Tick(b.MQTT.HomeAssistant.Interval) {
+			b.setHAConfig(typ, devClass, valueName, unit, uniqueID, dev, idx, deviceID)
+		}
+	}(typ, devClass, valueName, unit, uniqueID, dev, idx, deviceID)
+}
+
+func (b *BrickdCollector) setHAConfig(typ, devClass, valueName, unit, uniqueID string, dev *Device, idx int, deviceID string) {
 	topic := b.MQTT.HomeAssistant.DiscoveryBase
 	if topic == "" {
 		topic = "homeassistant/"
