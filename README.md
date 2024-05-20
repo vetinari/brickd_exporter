@@ -39,6 +39,7 @@ collector:
     log_level: info
     callback_period: 10s
     ignored_uids: []
+    led_status: "on"
     expire_period: 0s
 listen:
     address: :9639
@@ -70,6 +71,9 @@ for examples. Those will only applied to the defined sensors.
 brick / bricklet has been received from brickd more than this period ago it will not be shown anymore. `0s` (or any other
 `time.Duration` of `0` disables this feature (the default). Do not set this too low or you might not export anything :) 
 Depending on your use case 2 or more times the `collector.callback_period` should be OK.
+
+Setting `collector.led_status` attempts to set the LED of the bricklets where available, default is `"on"`, other possible
+values are `"off", `"heartbeat"` and `"status"`.
 
 ### MQTT
 

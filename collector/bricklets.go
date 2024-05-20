@@ -3,6 +3,8 @@ package collector
 import (
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/Tinkerforge/go-api-bindings/air_quality_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/ambient_light_v3_bricklet"
 	"github.com/Tinkerforge/go-api-bindings/analog_in_v3_bricklet"
@@ -74,6 +76,21 @@ func (b *BrickdCollector) RegisterAirQualityBricklet(dev *Device) ([]Register, e
 		return nil, fmt.Errorf("failed to set callback config for Air Quality Bricklet (uid=%s): %s", uid, err)
 	}
 
+	var ledStatus uint8
+	switch b.LEDStatus {
+	case "on":
+		ledStatus = air_quality_bricklet.StatusLEDConfigOn
+	case "off":
+		ledStatus = air_quality_bricklet.StatusLEDConfigOff
+	case "heartbeat":
+		ledStatus = air_quality_bricklet.StatusLEDConfigShowHeartbeat
+	case "status":
+		ledStatus = air_quality_bricklet.StatusLEDConfigShowStatus
+	}
+	if err := d.SetStatusLEDConfig(ledStatus); err != nil {
+		log.Errorf("failed to set LED status for device %s: %s", uid, err)
+	}
+
 	b.SetHAConfig("sensor", "aqi", "iaq_index", "", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
 	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
 	b.SetHAConfig("sensor", "atmospheric_pressure", "pressure", "hPa", fmt.Sprintf("air_quality_bricklet%s", uid), dev, 0, "")
@@ -110,6 +127,21 @@ func (b *BrickdCollector) RegisterAnalogInV3Bricklet(dev *Device) ([]Register, e
 	// valueHasToChange to false to also collect metrics if voltage is stable
 	// Threshold is turned off and min/max zero to always collect metrics in fixed period
 	d.SetVoltageCallbackConfiguration(b.CallbackPeriod, false, 'x', 0, 0)
+
+	var ledStatus uint8
+	switch b.LEDStatus {
+	case "on":
+		ledStatus = analog_in_v3_bricklet.StatusLEDConfigOn
+	case "off":
+		ledStatus = analog_in_v3_bricklet.StatusLEDConfigOff
+	case "heartbeat":
+		ledStatus = analog_in_v3_bricklet.StatusLEDConfigShowHeartbeat
+	case "status":
+		ledStatus = analog_in_v3_bricklet.StatusLEDConfigShowStatus
+	}
+	if err := d.SetStatusLEDConfig(ledStatus); err != nil {
+		log.Errorf("failed to set LED status for device %s: %s", uid, err)
+	}
 
 	b.SetHAConfig("sensor", "voltage", "voltage", "V", fmt.Sprintf("analog_in_v3_bricklet_%s", uid), dev, 0, "")
 
@@ -184,6 +216,21 @@ func (b *BrickdCollector) RegisterHumidityV2Bricklet(dev *Device) ([]Register, e
 		}
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	var ledStatus uint8
+	switch b.LEDStatus {
+	case "on":
+		ledStatus = humidity_v2_bricklet.StatusLEDConfigOn
+	case "off":
+		ledStatus = humidity_v2_bricklet.StatusLEDConfigOff
+	case "heartbeat":
+		ledStatus = humidity_v2_bricklet.StatusLEDConfigShowHeartbeat
+	case "status":
+		ledStatus = humidity_v2_bricklet.StatusLEDConfigShowStatus
+	}
+	if err := d.SetStatusLEDConfig(ledStatus); err != nil {
+		log.Errorf("failed to set LED status for device %s: %s", uid, err)
+	}
 
 	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0, "")
 	b.SetHAConfig("sensor", "temperature", "temperature", "°C", fmt.Sprintf("humidity_bricklet_v2_%s", uid), dev, 0, "")
@@ -292,6 +339,21 @@ func (b *BrickdCollector) RegisterBarometerV2Bricklet(dev *Device) ([]Register, 
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
 
+	var ledStatus uint8
+	switch b.LEDStatus {
+	case "on":
+		ledStatus = barometer_v2_bricklet.StatusLEDConfigOn
+	case "off":
+		ledStatus = barometer_v2_bricklet.StatusLEDConfigOff
+	case "heartbeat":
+		ledStatus = barometer_v2_bricklet.StatusLEDConfigShowHeartbeat
+	case "status":
+		ledStatus = barometer_v2_bricklet.StatusLEDConfigShowStatus
+	}
+	if err := d.SetStatusLEDConfig(ledStatus); err != nil {
+		log.Errorf("failed to set LED status for device %s: %s", uid, err)
+	}
+
 	b.SetHAConfig("sensor", "atmospheric_pressure", "air_pressure", "hPa", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
 	b.SetHAConfig("sensor", "distance", "altitude", "m", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
 	b.SetHAConfig("sensor", "temperature", "bricklet_temperature", "°C", fmt.Sprintf("barometer_bricklet_v2_%s", uid), dev, 0, "")
@@ -331,6 +393,21 @@ func (b *BrickdCollector) RegisterAmbientLightV3Bricklet(dev *Device) ([]Registe
 		}
 	})
 	d.SetIlluminanceCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	var ledStatus uint8
+	switch b.LEDStatus {
+	case "on":
+		ledStatus = ambient_light_v3_bricklet.StatusLEDConfigOn
+	case "off":
+		ledStatus = ambient_light_v3_bricklet.StatusLEDConfigOff
+	case "heartbeat":
+		ledStatus = ambient_light_v3_bricklet.StatusLEDConfigShowHeartbeat
+	case "status":
+		ledStatus = ambient_light_v3_bricklet.StatusLEDConfigShowStatus
+	}
+	if err := d.SetStatusLEDConfig(ledStatus); err != nil {
+		log.Errorf("failed to set LED status for device %s: %s", uid, err)
+	}
 
 	b.SetHAConfig("sensor", "illuminance", "illuminance", "lx", fmt.Sprintf("ambient_light_v3_bricklet_%s", uid), dev, 0, "")
 	return []Register{
@@ -386,6 +463,21 @@ func (b *BrickdCollector) RegisterCO2V2Bricklet(dev *Device) ([]Register, error)
 		}
 	})
 	d.SetTemperatureCallbackConfiguration(b.CallbackPeriod, true, 'x', 0, 0)
+
+	var ledStatus uint8
+	switch b.LEDStatus {
+	case "on":
+		ledStatus = co2_v2_bricklet.StatusLEDConfigOn
+	case "off":
+		ledStatus = co2_v2_bricklet.StatusLEDConfigOff
+	case "heartbeat":
+		ledStatus = co2_v2_bricklet.StatusLEDConfigShowHeartbeat
+	case "status":
+		ledStatus = co2_v2_bricklet.StatusLEDConfigShowStatus
+	}
+	if err := d.SetStatusLEDConfig(ledStatus); err != nil {
+		log.Errorf("failed to set LED status for device %s: %s", uid, err)
+	}
 
 	b.SetHAConfig("sensor", "carbon_dioxide", "co2_concentration", "ppm", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
 	b.SetHAConfig("sensor", "humidity", "humidity", "%", fmt.Sprintf("co2_v2_bricklet_%s", uid), dev, 0, "")
