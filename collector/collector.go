@@ -53,6 +53,7 @@ type BrickdCollector struct {
 	ExpirePeriod   time.Duration
 	ConnectCounter int64
 	MQTT           *mqtt.MQTT
+	LEDStatus      string
 }
 
 // RegisterFunc is the funcion of BrickdCollector to register callbacks

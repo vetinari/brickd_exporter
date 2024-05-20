@@ -1,6 +1,7 @@
 collector:
     log_level: debug
     callback_period: 15s
+    led_status: on
     ignored_uids:
     - v57
     labels:
