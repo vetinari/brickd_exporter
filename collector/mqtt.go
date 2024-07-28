@@ -42,8 +42,8 @@ func (b *BrickdCollector) exportMQTTOnce() {
 	go b.MQTT.Client.Publish(b.MQTT.Topic.Name("brickd_exporter"), enc)
 
 	mqData := make(map[string]mqttData)
-	for _, vals := range b.Data.Values {
-		for _, v := range vals {
+	for uid, vals := range b.Data.Values {
+		for idx, v := range vals {
 			if v.UID == "" || b.ignored(v.UID) {
 				continue
 			}
@@ -64,12 +64,11 @@ func (b *BrickdCollector) exportMQTTOnce() {
 					}
 					labels[k] = v
 				}
-				md.Topic = v.Name
+				md.Topic = b.SensorTopic(b.Data.Devices[uid], idx)
 				if sl, ok := b.SensorLabels[v.UID]; ok {
 					if l, ok := sl[strconv.Itoa(v.SensorID)]; ok {
 						for k, val := range l {
 							if k == "mqtt_topic" {
-								md.Topic = val
 								continue
 							}
 							if _, exists := labels[k]; exists {
