@@ -69,6 +69,7 @@ func (b *BrickdCollector) exportMQTTOnce() {
 					if l, ok := sl[strconv.Itoa(v.SensorID)]; ok {
 						for k, val := range l {
 							if k == "mqtt_topic" {
+								md.Topic = val
 								continue
 							}
 							if _, exists := labels[k]; exists {
