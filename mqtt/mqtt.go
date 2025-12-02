@@ -96,6 +96,11 @@ func (c *Client) Publish(topic string, data []byte) {
 	token.Wait()
 }
 
+func (c *Client) PublishRetained(topic string, data []byte) {
+	token := c.c.Publish(topic, 1, true, data)
+	token.Wait()
+}
+
 func (c *Client) Client() mqtt.Client {
 	return c.c
 }
