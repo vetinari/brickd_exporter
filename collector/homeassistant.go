@@ -78,7 +78,7 @@ func (b *BrickdCollector) setHAConfig(typ, devClass, valueName, unit, uniqueID s
 		return
 	}
 	log.Infof("publishing HA config to %s: %s", topic, string(enc))
-	go b.MQTT.Client.Publish(topic, enc)
+	go b.MQTT.Client.PublishRetained(topic, enc)
 }
 
 type HAConfig struct {
